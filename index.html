@@ -359,7 +359,9 @@ const totalStars=()=>SECTIONS.reduce((a,s)=>a+(P.stars[s.id]||0),0);
 let saveT=null;
 function save(){if(!me)return;S.set(K.cache(me.uid),P);if(!CLOUD){S.set(K.p(me.uid),P);return}clearTimeout(saveT);saveT=setTimeout(pushCloud,1200)}
 function pushCloud(){if(!CLOUD||!fb||!me)return;clearTimeout(saveT);saveT=null;
- fb.db.collection('players').doc(me.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:totalStars(),learned:Object.keys(P.learned).length,updated:firebase.firestore.FieldValue.serverTimestamp(),p:P},{merge:true}).catch(()=>{});}
+ const FV=firebase.firestore.FieldValue;
+ fb.db.collection('players').doc(me.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:totalStars(),learned:Object.keys(P.learned).length,updated:FV.serverTimestamp(),p:FV.delete()},{merge:true}).catch(()=>{});
+ fb.db.collection('progress').doc(me.uid).set({name:me.name,login:me.login||'',p:P,updated:FV.serverTimestamp()},{merge:true}).catch(()=>{});}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&saveT)pushCloud()});
 const dstr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 function touchStreak(){const t=dstr(new Date());if(P.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDay===dstr(y)?P.streak+1:1;P.lastDay=t;if(P.streak>=3)award('streak')}
@@ -410,7 +412,7 @@ function scene(inner,cls=''){return `<div class="scene ${cls}"><svg class="land"
 
 /* ===== RENDER ===== */
 const app=document.getElementById('app');
-function render(view,arg){window.scrollTo(0,0);document.querySelector('.sheet-back')?.remove();({auth:vAuth,home:vHome,play:vPlay,cards:vCards,result:vResult,top:vTop,badges:vBadges,ranks:vRanks})[view](arg)}
+function render(view,arg){window.scrollTo(0,0);document.querySelector('.sheet-back')?.remove();({admin:vAdmin,player:vPlayer,auth:vAuth,home:vHome,play:vPlay,cards:vCards,result:vResult,top:vTop,badges:vBadges,ranks:vRanks})[view](arg)}
 
 function vAuth(){
  const reg=authTab==='reg';
@@ -453,10 +455,15 @@ function vAuth(){
 function startSession(){if(!TBY[P.cur])P.cur='t11';if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}lastRank=rankOf(P.xp).r.i;render('home');toast('Сәлем, '+me.name+'!')}
 function localLogin(key){const users=S.get(K.users)||{};me={uid:key,name:users[key]?.name||key};P=Object.assign(blankP(),S.get(K.p(key))||{});S.set(K.sess,key);startSession()}
 async function cloudUser(u){
- me={uid:u.uid,name:u.displayName||'Ойыншы'};
- try{const d=await fb.db.collection('players').doc(u.uid).get();
-  if(d.exists){const x=d.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{})}
-  else{if(pendingReg)me.name=pendingReg.name;P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});await fb.db.collection('players').doc(u.uid).set({name:me.name,login:pendingReg?.login||'',xp:P.xp,rank:rankOf(P.xp).r.i,stars:0,learned:0,created:firebase.firestore.FieldValue.serverTimestamp(),p:P});if(pendingReg)u.updateProfile({displayName:me.name}).catch(()=>{});pendingReg=null}
+ me={uid:u.uid,name:u.displayName||'Ойыншы',login:(u.email||'').split('@')[0],admin:false};
+ try{
+  const [pr,pl,ad]=await Promise.all([fb.db.collection('progress').doc(u.uid).get(),fb.db.collection('players').doc(u.uid).get(),fb.db.collection('admins').doc(u.uid).get().catch(()=>null)]);
+  me.admin=!!(ad&&ad.exists);
+  if(pr.exists){const x=pr.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{})}
+  else if(pl.exists){const x=pl.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{});pushCloud()}
+  else{if(pendingReg)me.name=pendingReg.name;P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});
+   await fb.db.collection('players').doc(u.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:0,learned:0,created:firebase.firestore.FieldValue.serverTimestamp(),updated:firebase.firestore.FieldValue.serverTimestamp()});
+   pushCloud();if(pendingReg)u.updateProfile({displayName:me.name}).catch(()=>{});pendingReg=null}
  }catch(e){P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});toast('Интернет жоқ: прогресс кейін сақталады')}
  startSession();
 }
@@ -486,6 +493,7 @@ function vHome(){
  </div>
  <div class="orn"></div>
  <button class="btn ${mist?'gold':'ghost'} block" data-a="review" ${mist?'':'disabled'}>Қателерді қайталау${mist?' · '+mist:''}</button>
+ ${me.admin?'<button class="btn gold block" data-a="admin">Админ панель</button>':''}
  <div class="extra"><button class="btn ghost" data-a="top">Рейтинг</button><button class="btn ghost" data-a="badges">Жетістіктер</button></div>`;
 }
 
@@ -598,6 +606,65 @@ function vBadges(){
  <div class="list">${BADGES.map(b=>`<div class="badge ${P.badges.includes(b.id)?'got':''}"><div class="ic">${IC[b.ic]}</div><div class="grow"><b>${b.n}</b><p class="muted" style="font-size:.88rem">${b.d}</p></div></div>`).join('')}</div>`;
 }
 
+
+/* ===== АДМИН ===== */
+const ago=ts=>{if(!ts||!ts.toDate)return '—';const d=ts.toDate(),m=(Date.now()-d)/60000;if(m<2)return 'қазір';if(m<60)return Math.round(m)+' мин бұрын';if(m<1440)return Math.round(m/60)+' сағ бұрын';return Math.round(m/1440)+' күн бұрын'};
+async function vAdmin(){
+ if(!me.admin){render('home');return}
+ app.innerHTML=`<div class="nav"><h1>Админ панель</h1><button class="linkbtn" data-a="home">Артқа</button></div>
+ <div id="adm"><div class="center" style="min-height:120px">Жүктелуде…</div></div>`;
+ let players=[],progs=[];
+ try{const [a,b]=await Promise.all([fb.db.collection('players').orderBy('xp','desc').limit(500).get(),fb.db.collection('progress').limit(500).get()]);
+  a.forEach(d=>players.push({uid:d.id,...d.data()}));b.forEach(d=>progs.push({uid:d.id,...d.data()}));
+ }catch(e){document.getElementById('adm').innerHTML='<p class="err">Деректерді оқу мүмкін болмады. Firestore ережелерін (firestore.rules) жаңартқаныңды тексер.</p>';return}
+ const el=document.getElementById('adm');if(!el)return;
+ const logins=Object.fromEntries(progs.map(x=>[x.uid,x.login||'']));
+ const today=players.filter(x=>x.updated&&x.updated.toDate&&(Date.now()-x.updated.toDate())<864e5).length;
+ const avg=players.length?Math.round(players.reduce((a,x)=>a+(x.xp||0),0)/players.length):0;
+ const miss={};progs.forEach(x=>Object.keys((x.p&&x.p.mistakes)||{}).forEach(k=>miss[k]=(miss[k]||0)+1));
+ const hard=Object.entries(miss).filter(([k])=>QBY[k]).sort((a,b)=>b[1]-a[1]).slice(0,8);
+ el.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
+  <div class="stats"><div class="stat"><b>${players.length}</b><span>ойыншы</span></div><div class="stat"><b>${today}</b><span>бүгін белсенді</span></div><div class="stat"><b>${avg}</b><span>орташа XP</span></div></div>
+  ${hard.length?`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Ең көп қате жіберілетін сұрақтар</span>${hard.map(([k,n])=>`<div><b style="font-size:.92rem">${esc(QBY[k].q)}</b><p class="muted" style="font-size:.85rem">Жауабы: ${esc(QBY[k].o[QBY[k].a])} · ${n} ойыншыда қате</p></div>`).join('')}</div>`:''}
+  <div class="field"><label for="admq">Ойыншыны іздеу</label><input id="admq" placeholder="аты немесе логині"></div>
+  <div class="list" id="admlist"></div></div>`;
+ const draw=q=>{q=(q||'').toLowerCase();document.getElementById('admlist').innerHTML=players.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(logins[x.uid]||'').includes(q)).map((x,i)=>{const R=rankOf(x.xp||0).r;
+  return `<button class="li" style="text-align:left;width:100%" data-a="player" data-u="${esc(x.uid)}"><span class="rank">${i+1}</span>${emblem(R)}<div class="grow"><b>${esc(x.name||'Ойыншы')}</b><span>@${esc(logins[x.uid]||'?')} · ${esc(R.n)} · ${ago(x.updated)}</span></div><span class="chip">${x.xp||0} XP</span></button>`}).join('')||'<p class="muted">Ешкім табылмады</p>'};
+ draw('');document.getElementById('admq').addEventListener('input',e=>draw(e.target.value));
+}
+async function vPlayer(uid){
+ if(!me.admin){render('home');return}
+ app.innerHTML=`<div class="nav"><h1>Ойыншы</h1><button class="linkbtn" data-a="admin">Тізімге</button></div><div id="pl"><div class="center" style="min-height:120px">Жүктелуде…</div></div>`;
+ let pl,pr,ad;
+ try{[pl,pr,ad]=await Promise.all([fb.db.collection('players').doc(uid).get(),fb.db.collection('progress').doc(uid).get(),fb.db.collection('admins').doc(uid).get()])}
+ catch(e){document.getElementById('pl').innerHTML='<p class="err">Ойыншыны жүктеу мүмкін болмады.</p>';return}
+ const el=document.getElementById('pl');if(!el)return;
+ const x=pl.exists?pl.data():{},y=pr.exists?pr.data():{},p=Object.assign(blankP(),y.p||{}),R=rankOf(p.xp||x.xp||0);
+ const mist=Object.keys(p.mistakes).filter(k=>QBY[k]);
+ el.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
+  <div class="panel rankrow">${emblem(R.r)}<div class="t"><b>${esc(x.name||y.name||'Ойыншы')}</b><span class="muted" style="font-size:.88rem">@${esc(y.login||'?')} · ${esc(R.r.n)} · ${p.xp} XP${ad.exists?' · админ':''}</span><span class="muted" style="font-size:.85rem">Соңғы кіру: ${ago(x.updated)}</span></div></div>
+  <div class="stats"><div class="stat"><b>${p.quizzes}</b><span>тест тапсырды</span></div><div class="stat"><b>${Object.keys(p.learned).length}/${ALLQ.length}</b><span>жатталды</span></div><div class="stat"><b>${p.streak}</b><span>күн қатарынан</span></div></div>
+  ${TESTS.map(t=>`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Тест ${t.num} · ${esc(t.name)}</span>
+   ${t.secs.map(s=>{const b=p.best[s.id]||0,l=s.qs.filter(q=>p.learned[q.id]).length;return `<div style="display:flex;flex-direction:column;gap:4px"><div class="barlbl" style="color:var(--ink)"><span>${esc(s.name)}</span><span>${b}% ${'★'.repeat(p.stars[s.id]||0)}</span></div><div class="bar"><i style="width:${b}%"></i></div><span class="muted" style="font-size:.8rem">Жатталды ${l}/${s.qs.length}</span></div>`}).join('')}
+   <span class="muted" style="font-weight:700;font-size:.88rem">Қорытынды сынақ: ${p.exam[t.id]?p.exam[t.id]+'%':'тапсырмаған'}</span></div>`).join('')}
+  <div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Қате жіберген сұрақтары · ${mist.length}</span>
+   ${mist.length?mist.map(k=>`<div><b style="font-size:.9rem">${esc(QBY[k].q)}</b><p class="muted" style="font-size:.85rem">Жауабы: ${esc(QBY[k].o[QBY[k].a])}</p></div>`).join(''):'<p class="muted">Қате жоқ</p>'}</div>
+  ${uid===me.uid?'':`<button class="btn ghost block" data-a="${ad.exists?'rmadmin':'mkadmin'}" data-u="${esc(uid)}">${ad.exists?'Админ құқығын алу':'Админ ету'}</button>
+  <button class="btn ghost block" style="color:var(--bad)" data-a="delp" data-u="${esc(uid)}">Рейтингтен өшіру</button>`}
+ </div>`;
+}
+async function adminAct(btn,kind){
+ if(!me.admin)return;const uid=btn.dataset.u;
+ if(btn.dataset.sure!=='1'){btn.dataset.sure='1';btn.dataset.txt=btn.textContent;btn.textContent='Сенімдісің бе? Тағы бір рет бас';setTimeout(()=>{if(btn.isConnected){btn.dataset.sure='';btn.textContent=btn.dataset.txt}},4000);return}
+ btn.disabled=true;
+ try{
+  if(kind==='mk'){await fb.db.collection('admins').doc(uid).set({by:me.uid,at:firebase.firestore.FieldValue.serverTimestamp()});toast('Админ болды')}
+  if(kind==='rm'){await fb.db.collection('admins').doc(uid).delete();toast('Админ құқығы алынды')}
+  if(kind==='del'){await Promise.all([fb.db.collection('players').doc(uid).delete(),fb.db.collection('progress').doc(uid).delete()]);toast('Ойыншы рейтингтен өшірілді');render('admin');return}
+  vPlayer(uid);
+ }catch(e){btn.disabled=false;toast('Орындалмады: құқық жоқ немесе интернет жоқ')}
+}
+
 /* оқиғалар */
 document.addEventListener('click',e=>{
  const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,s=t.dataset.s;
@@ -605,7 +672,7 @@ document.addEventListener('click',e=>{
   open:()=>{const ts=SECBY[s].test;if(!document.querySelector('.node')||P.cur!==ts){P.cur=ts;save();render('home')}openSheet(s)},close:()=>document.querySelector('.sheet-back')?.remove(),
   quiz:()=>startQuiz('quiz',s),cards:()=>startCards(s),review:()=>startQuiz('review'),exam:()=>allDone(P.cur)?startQuiz('exam'):toast('Алдымен барлық бөлімде 1 жұлдыз жина'),
   pick:()=>pick(+t.dataset.o),next,quit:()=>render('home'),flip:()=>{if(!play.flip){play.flip=true;vCards()}},know:()=>cardAns(true),dunno:()=>cardAns(false),
-  top:()=>render('top'),badges:()=>render('badges'),ranks:()=>render('ranks'),closelvl:()=>document.querySelector('.levelup')?.remove()})[a]?.();
+  top:()=>render('top'),badges:()=>render('badges'),ranks:()=>render('ranks'),admin:()=>render('admin'),player:()=>render('player',t.dataset.u),filter:()=>{},mkadmin:()=>adminAct(t,'mk'),rmadmin:()=>adminAct(t,'rm'),delp:()=>adminAct(t,'del'),closelvl:()=>document.querySelector('.levelup')?.remove()})[a]?.();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('.sheet-back')?.remove();document.querySelector('.levelup')?.remove()}if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card')){e.preventDefault();e.target.click()}});
 

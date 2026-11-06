@@ -1,9 +1,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    // Рейтинг: аты, XP, атақ — бәріне көрінеді
     match /players/{uid} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null && (request.auth.uid == uid || isAdmin());
+    }
+    // Толық прогресс: тек өзі және админдер
+    match /progress/{uid} {
+      allow read, write: if request.auth != null && (request.auth.uid == uid || isAdmin());
+    }
+    // Админдер тізімі: тек админ өзгерте алады
+    match /admins/{uid} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
     }
   }
 }
