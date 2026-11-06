@@ -4,38 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Дала тарихы</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Қазақстан тарихы бойынша жаттау ойыны: тақырыптық тест 11 және 12.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
-:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
-/* Layout: a single centred column (max 560px) — header with level bar, then a winding path of section nodes, like a game map */
+/* Layout: one centred column (max 560px). A steppe landscape opens the page; sections sit along a dotted caravan trail like a game map */
 :root{
-  --bg:#EAF1F4; --surface:#FFFFFF; --ink:#12202C; --muted:#5A6B78; --line:#D3DEE5;
-  --accent:#0B8A87; --accent-ink:#FFFFFF; --accent-soft:#D5EEED;
-  --gold:#C38A1E; --gold-soft:#F6E8C9; --ok:#1E9A53; --ok-soft:#DDF3E5; --bad:#D04343; --bad-soft:#FBE1E1;
+  --sky1:#7FCBEB; --sky2:#D9F0F8; --bg:#F1F5E8; --surface:#FFFFFF; --ink:#1B2A22; --muted:#5C6C5F; --line:#D7E0CB;
+  --accent:#0095B6; --accent-ink:#FFFFFF; --accent-soft:#D3EEF5;
+  --gold:#CF9416; --gold-soft:#F7E9C2; --grass:#9EB55A; --grass2:#C8C27C; --mount:#A7C6DB; --sun:#FFCF4D; --yurt:#F6F1E6; --starop:0;
+  --bronze:#B06F37; --silver:#8796A3; --lazur:#1C68AE;
+  --ok:#1E9A53; --ok-soft:#DDF3E5; --bad:#D04343; --bad-soft:#FBE1E1;
   --font-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --font-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0C1620; --surface:#14222E; --ink:#E6EDF1; --muted:#8CA0AE; --line:#243849;
-  --accent:#2CBFBA; --accent-ink:#07211F; --accent-soft:#123B3B;
-  --gold:#E5B24D; --gold-soft:#3A2E14; --ok:#3CC57A; --ok-soft:#123323; --bad:#F06A6A; --bad-soft:#3A1818; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0C1620; --surface:#14222E; --ink:#E6EDF1; --muted:#8CA0AE; --line:#243849;
-  --accent:#2CBFBA; --accent-ink:#07211F; --accent-soft:#123B3B;
-  --gold:#E5B24D; --gold-soft:#3A2E14; --ok:#3CC57A; --ok-soft:#123323; --bad:#F06A6A; --bad-soft:#3A1818; color-scheme:dark}
+@media (prefers-color-scheme:dark){:root{
+  --sky1:#081429; --sky2:#13253D; --bg:#0E1915; --surface:#16241E; --ink:#E7EEE5; --muted:#91A395; --line:#28392F;
+  --accent:#2CC2DF; --accent-ink:#04212A; --accent-soft:#11343E;
+  --gold:#EBB445; --gold-soft:#3A2D12; --grass:#3B4F2E; --grass2:#55603A; --mount:#2A3E56; --sun:#F1EFD6; --yurt:#CDC4B1; --starop:1;
+  --bronze:#D08C52; --silver:#A9B6C1; --lazur:#5AA6EE;
+  --ok:#3CC57A; --ok-soft:#123323; --bad:#F06A6A; --bad-soft:#3A1818; color-scheme:dark}}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+body{margin:0;background:linear-gradient(180deg,var(--sky2) 0,var(--bg) 420px) var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px}
+[hidden]{display:none!important}
 #app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
-h1{font-size:1.5rem;line-height:1.2} h2{font-size:1.15rem} h3{font-size:1rem}
+h1{font-size:1.45rem;line-height:1.2} h2{font-size:1.12rem} h3{font-size:1rem}
 p{margin:0}
 .muted{color:var(--muted)}
 .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted)}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 20px;border-radius:14px;font-weight:800;font-size:1rem;
   background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000);transition:transform .08s}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 60%,#000)}
@@ -43,65 +45,75 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .btn.gold{background:var(--gold);color:#1d1404;box-shadow:0 4px 0 color-mix(in srgb,var(--gold) 55%,#000)}
 .btn.block{width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.panel{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:20px}
-.orn{height:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cpath d='M22 20V12M22 12c0-6-8-9-11-5s1 7 4 5M22 12c0-6 8-9 11-5s-1 7-4 5' fill='none' stroke='%23C38A1E' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:repeat-x;opacity:.8}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:18px}
+.orn{height:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cpath d='M22 20V12M22 12c0-6-8-9-11-5s1 7 4 5M22 12c0-6 8-9 11-5s-1 7-4 5' fill='none' stroke='%23CF9416' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:repeat-x;opacity:.85}
+/* steppe scene */
+.scene{position:relative;border-radius:24px;overflow:hidden;border:2px solid var(--line);min-height:170px;display:flex}
+.scene svg.land{position:absolute;inset:0;width:100%;height:100%}
+.scene .over{position:relative;padding:18px;display:flex;flex-direction:column;gap:4px;max-width:70%}
+.scene .over h1{font-size:1.5rem}
+.scene .over p{font-weight:700;color:var(--ink);opacity:.8}
+.scene.small{min-height:120px}
 /* auth */
-.auth{display:flex;flex-direction:column;gap:18px;padding-top:12px}
-.auth .hero{display:flex;flex-direction:column;gap:8px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:12px;padding:4px;gap:4px}
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--line);border-radius:12px;padding:4px;gap:4px}
 .tabs button{min-height:42px;border-radius:9px;font-weight:800;color:var(--muted)}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 form{display:flex;flex-direction:column;gap:14px}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-weight:700;font-size:.9rem}
-input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.field small{color:var(--muted);font-size:.8rem}
+input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
 .err{color:var(--bad);font-weight:700;font-size:.9rem;min-height:1.2em}
+.note{font-size:.85rem;text-align:center;color:var(--muted)}
 /* header */
 .top{display:flex;align-items:center;gap:12px}
 .avatar{width:46px;height:46px;flex:none;border-radius:14px;background:var(--gold-soft);color:var(--gold);display:grid;place-items:center;font-family:var(--font-display);font-size:1.1rem}
 .top .who{flex:1;min-width:0}
 .top .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-weight:800;font-size:.9rem;font-variant-numeric:tabular-nums}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font-weight:800;font-size:.88rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .chip svg{width:16px;height:16px}
-.lvl{display:flex;flex-direction:column;gap:8px}
-.lvl .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.lvl .title{font-family:var(--font-display);font-size:1.05rem}
+.rankcard{display:flex;flex-direction:column;gap:12px;cursor:pointer;text-align:left;width:100%}
+.rankrow{display:flex;gap:14px;align-items:center}
+.emb{width:54px;height:60px;flex:none}
+.rankrow .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rankrow .t b{font-family:var(--font-display);font-size:1.15rem}
 .bar{height:14px;border-radius:99px;background:var(--bg);overflow:hidden;border:2px solid var(--line)}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--gold)));border-radius:99px;transition:width .5s}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 55%,var(--gold)));border-radius:99px;transition:width .5s}
+.barlbl{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:var(--bg);border-radius:14px;padding:10px;text-align:center}
-.stat b{display:block;font-family:var(--font-display);font-size:1.1rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.78rem;color:var(--muted);font-weight:700}
+.stat{background:var(--bg);border-radius:14px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-family:var(--font-display);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.76rem;color:var(--muted);font-weight:700}
 /* path */
-.path{display:flex;flex-direction:column;gap:6px;padding:6px 0}
-.node{display:flex;align-items:center;gap:14px;width:86%;text-align:left;padding:12px;border-radius:20px;background:var(--surface);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
-.node:nth-child(odd){align-self:flex-start}
-.node:nth-child(even){align-self:flex-end}
+.path{display:flex;flex-direction:column;gap:0;padding:4px 0}
+.node{display:flex;align-items:center;gap:14px;width:88%;text-align:left;padding:12px;border-radius:20px;background:var(--surface);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.path>.node:nth-of-type(odd){align-self:flex-start}
+.path>.node:nth-of-type(even){align-self:flex-end}
 .node.locked{opacity:.55}
 .node .disc{position:relative;width:60px;height:60px;flex:none}
 .node .disc svg{position:absolute;inset:0}
-.node .disc span{position:absolute;inset:7px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:1.15rem;background:var(--accent-soft);color:var(--accent)}
+.node .disc span{position:absolute;inset:7px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:1.1rem;background:var(--accent-soft);color:var(--accent)}
 .node.done .disc span{background:var(--gold-soft);color:var(--gold)}
 .node .info{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
 .node .info b{font-weight:800;line-height:1.25}
 .node .info small{color:var(--muted);font-weight:600}
 .stars{display:flex;gap:2px}
 .stars svg{width:16px;height:16px}
-.connector{width:3px;height:14px;background:repeating-linear-gradient(var(--line) 0 5px,transparent 5px 9px);align-self:center}
+.trail{height:26px;width:60%;align-self:center;background:radial-gradient(circle,var(--gold) 2.2px,transparent 2.6px) center/12px 12px repeat-x;opacity:.7}
 .extra{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 /* sheet */
-.sheet-back{position:fixed;inset:0;background:rgba(5,12,18,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet-back{position:fixed;inset:0;background:rgba(5,12,10,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
 .sheet{width:100%;max-width:560px;background:var(--surface);border-radius:24px 24px 0 0;padding:22px max(18px,env(safe-area-inset-left,0px)) calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:up .22s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.6}}
-.sheet .meta{display:flex;flex-wrap:wrap;gap:8px}
+.sheet .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 /* play */
 .playtop{display:flex;align-items:center;gap:12px}
 .x{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;color:var(--muted)}
 .x svg{width:22px;height:22px}
 .playtop .bar{flex:1}
 .combo{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
-.q{font-size:1.15rem;font-weight:800;line-height:1.4}
-.ctx{font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:12px;padding:12px;border-left:4px solid var(--gold)}
+.q{font-size:1.12rem;font-weight:800;line-height:1.4}
+.ctx{font-size:.92rem;color:var(--muted);background:var(--surface);border-radius:12px;padding:12px;border-left:4px solid var(--gold)}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{display:flex;gap:12px;align-items:center;text-align:left;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);box-shadow:0 3px 0 var(--line);font-weight:700}
 .opt .k{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;font-size:.85rem;color:var(--muted)}
@@ -116,46 +128,63 @@ input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px 
 .feedback b{font-family:var(--font-display);font-size:1rem}
 .feedback p{color:var(--ink);font-weight:600}
 /* flashcard */
-.card{perspective:1200px;min-height:280px;cursor:pointer}
-.card-in{position:relative;width:100%;min-height:280px;transition:transform .45s;transform-style:preserve-3d}
+.card{perspective:1200px;min-height:290px;cursor:pointer}
+.card-in{position:relative;width:100%;min-height:290px;transition:transform .45s;transform-style:preserve-3d}
 .card.flip .card-in{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;justify-content:center;border:2px solid var(--line);background:var(--surface);box-shadow:0 5px 0 var(--line)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;justify-content:center;border:2px solid var(--line);background:var(--surface);box-shadow:0 5px 0 var(--line);overflow:auto}
 .face.back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent);box-shadow:0 5px 0 var(--accent)}
 .face.back .ans{font-family:var(--font-display);font-size:1.3rem;color:var(--accent);line-height:1.3}
 .hint{font-size:.85rem;color:var(--muted);font-weight:700}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 /* result */
-.result{text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center;padding-top:20px}
+.result{text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center;padding-top:16px}
 .bigstars{display:flex;gap:8px}
 .bigstars svg{width:56px;height:56px}
-.bigstars svg:nth-child(2){transform:translateY(-12px)}
+.bigstars span:nth-child(2) svg{transform:translateY(-12px)}
 .pop{animation:pop .45s cubic-bezier(.3,1.6,.6,1) both}
 .pop:nth-child(2){animation-delay:.12s}.pop:nth-child(3){animation-delay:.24s}
 @keyframes pop{from{transform:scale(.3);opacity:0}}
 .result .stats{width:100%}
 /* lists */
 .list{display:flex;flex-direction:column;gap:8px}
-.li{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--bg)}
-.li .rank{font-family:var(--font-display);width:28px;text-align:center;color:var(--muted)}
+.li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:var(--surface);border:2px solid var(--line)}
+.li .rank{font-family:var(--font-display);width:28px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.li.p1 .rank{color:var(--gold)} .li.p2 .rank{color:var(--silver)} .li.p3 .rank{color:var(--bronze)}
 .li .grow{flex:1;min-width:0}
 .li .grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.li.me{outline:2px solid var(--accent)}
-.badge{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--bg)}
+.li .grow span{font-size:.84rem;color:var(--muted);font-weight:700}
+.li.me{border-color:var(--accent);background:var(--accent-soft)}
+.li .emb{width:30px;height:34px}
+.ladder .step{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:var(--surface);border:2px solid var(--line)}
+.ladder .step.lock{opacity:.55}
+.ladder .step.cur{border-color:var(--accent);box-shadow:0 4px 0 var(--accent)}
+.ladder .step .emb{width:42px;height:46px}
+.ladder .step .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ladder .step .grow b{font-family:var(--font-display);font-size:.98rem}
+.ladder .step .grow p{font-size:.86rem;color:var(--muted)}
+.ladder .xp{font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem;white-space:nowrap}
+.tierhead{display:flex;align-items:center;gap:8px;margin-top:8px}
+.tierhead i{width:12px;height:12px;border-radius:4px}
+.badge{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--surface);border:2px solid var(--line)}
 .badge .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--line);color:var(--muted)}
 .badge.got .ic{background:var(--gold-soft);color:var(--gold)}
 .badge:not(.got){opacity:.6}
 .badge .ic svg{width:24px;height:24px}
+.badge .grow{flex:1;min-width:0}
 .nav{display:flex;gap:8px;justify-content:space-between;align-items:center}
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:800;z-index:40;animation:tin .3s ease-out;max-width:90vw;text-align:center}
 @keyframes tin{from{transform:translate(-50%,-20px);opacity:0}}
 .linkbtn{color:var(--accent);font-weight:800;padding:8px 4px}
+.levelup{position:fixed;inset:0;z-index:30;background:rgba(5,12,10,.6);display:grid;place-items:center;padding:20px}
+.levelup .box{background:var(--surface);border-radius:24px;padding:26px 22px;max-width:360px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;animation:pop .5s cubic-bezier(.3,1.6,.6,1)}
+.levelup .emb{width:90px;height:100px}
+.center{display:grid;place-items:center;min-height:50vh;color:var(--muted);font-weight:700}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-
+<script src="firebase-config.js"></script>
 </head>
 <body>
-<div id="app" aria-live="polite"></div>
-
+<div id="app" aria-live="polite"><div class="center">Жүктелуде…</div></div>
 <script>
 /* ===== DATA (Тақырыптық тест 11) ===== */
 const S11=[
@@ -256,6 +285,7 @@ const S12=[
 ['VI–VIII ғасырларға жататын Қаратау баурайындағы қала:',['Суяб','Баладж','Отырар','Науакент'],1],
 ]},
 ];
+
 const TESTS=[{id:'t11',num:11,name:'Қарахан, Қарақытай мемлекеті',secs:S11},{id:'t12',num:12,name:'Керей, Найман, Жалайыр, Қыпшақ',secs:S12}];
 TESTS.forEach(t=>t.secs.forEach(s=>s.test=t.id));
 const SECTIONS=[...S11,...S12];
@@ -264,7 +294,30 @@ SECTIONS.forEach(s=>s.qs=s.qs.map((x,i)=>({id:s.id+':'+i,sec:s.id,q:x[0],o:x[1],
 const ALLQ=SECTIONS.flatMap(s=>s.qs);
 const QBY=Object.fromEntries(ALLQ.map(q=>[q.id,q]));
 const SECBY=Object.fromEntries(SECTIONS.map(s=>[s.id,s]));
-const TITLES=['Шәкірт','Сарбаз','Жауынгер','Батыр','Бек','Сұлтан','Хан','Қаған'];
+
+/* ===== АТАҚТАР ===== */
+const TIERS=[{n:'Қола',c:'var(--bronze)'},{n:'Күміс',c:'var(--silver)'},{n:'Алтын',c:'var(--gold)'},{n:'Көк',c:'var(--lazur)'}];
+const RANKS=[
+ [0,'Бала','Жолдың басы. Ұлы даланы енді танып келесің.'],
+ [60,'Шәкірт','Ұстаздан тәлім алып, тарихты оқи бастадың.'],
+ [150,'Қосшы','Батырдың жанындағы сенімді серік.'],
+ [280,'Жылқышы','Үйірді бағып, даланың әр сайын білесің.'],
+ [450,'Сарбаз','Қолға алынған алғашқы жауынгер.'],
+ [650,'Жасауыл','Ханның бұйрығын жеткізетін сенімді адам.'],
+ [900,'Жауынгер','Сапта тұрып, шайқасты көрген ер.'],
+ [1200,'Ер','Елі сенген, сөзінде тұратын азамат.'],
+ [1600,'Батыр','Жауға қарсы шауып, ел қорғаған қаһарман.'],
+ [2100,'Бас батыр','Батырларды соңынан ертетін қолбасшы.'],
+ [2700,'Би','Дауды әділ шешетін шешен, елдің ақылшысы.'],
+ [3400,'Бек','Өз иелігін басқаратын ақсүйек.'],
+ [4200,'Тархан','Алым-салықтан босатылған құрметті ақсүйек.'],
+ [5200,'Сұлтан','Хан әулетінен шыққан, ұлысты басқаратын төре.'],
+ [6400,'Хан','Хандықтың билеушісі, құрылтайдың төрағасы.'],
+ [8000,'Қаған','Ұлы даланың билеушісі. Тарихтың шыңы.'],
+].map((r,i)=>({i,xp:r[0],n:r[1],d:r[2],tier:Math.floor(i/4)}));
+function rankOf(xp){let r=RANKS[0];for(const x of RANKS)if(xp>=x.xp)r=x;const nx=RANKS[r.i+1]||null;return{r,nx,pct:nx?(xp-r.xp)/(nx.xp-r.xp)*100:100,left:nx?nx.xp-xp:0}}
+function emblem(r,cls='emb'){const c=TIERS[r.tier].c;return `<svg class="${cls}" viewBox="0 0 54 60" aria-hidden="true"><path d="M27 2l23 8v16c0 15-10 26-23 32C14 52 4 41 4 26V10z" fill="${c}"/><path d="M27 7l18 6v13c0 12-8 21-18 26-10-5-18-14-18-26V13z" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/><text x="27" y="36" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-size="16" font-weight="700" fill="#fff">${r.i+1}</text></svg>`}
+
 const BADGES=[
  {id:'first',n:'Алғашқы қадам',d:'Бірінші тестті аяқта',ic:'flag'},
  {id:'perfect',n:'Мінсіз',d:'Бір бөлімді 100% тапсыр',ic:'star'},
@@ -272,23 +325,44 @@ const BADGES=[
  {id:'memory',n:'Жадыгер',d:'20 карточканы жатта',ic:'brain'},
  {id:'allsec',n:'Дала билеушісі',d:'Бір тесттің барлық бөлімінде кемі 1 жұлдыз',ic:'map'},
  {id:'exam',n:'Ұлы хан',d:'Кез келген қорытынды сынақ — 85%+',ic:'crown'},
+ {id:'streak',n:'Көшпенді',d:'3 күн қатарынан ойна',ic:'fire'},
+ {id:'batyr',n:'Батыр атағы',d:'«Батыр» атағына жет',ic:'shield'},
 ];
 
-/* ===== STORAGE (safe) ===== */
+/* ===== STORAGE ===== */
 const mem={};
 const S={get(k){try{const v=localStorage.getItem(k);return v==null?(mem[k]??null):JSON.parse(v)}catch(e){return mem[k]??null}},
  set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
  del(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}};
-const K={users:'dt12_users',sess:'dt12_session',p:u=>'dt12_p_'+u};
+const K={users:'dt12_users',sess:'dt12_session',p:u=>'dt12_p_'+u,cache:u=>'dt_cache_'+u};
 async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('dt12|'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return 'f'+h}}
 
+/* ===== BACKEND: Firebase (ортақ) немесе осы құрылғы ===== */
+const CFG=window.FIREBASE_CONFIG||{};
+const CLOUD=!!(CFG&&CFG.apiKey);
+let fb=null;
+const loadScript=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+const emailOf=login=>login.toLowerCase()+'@dala-tarihy.kz';
+function fbErr(e){const c=(e&&e.code)||'';
+ if(c.includes('email-already-in-use'))return 'Бұл логин бос емес, басқасын таңда';
+ if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')||c.includes('invalid-login'))return 'Логин немесе құпиясөз қате. Қайта көр';
+ if(c.includes('weak-password'))return 'Құпиясөз кемі 6 таңбадан тұруы керек';
+ if(c.includes('network'))return 'Интернет байланысы жоқ. Қосылып, қайта көр';
+ if(c.includes('too-many-requests'))return 'Тым көп әрекет. Бір минуттан соң қайта көр';
+ if(c.includes('operation-not-allowed'))return 'Firebase-те Email/Password кіру қосылмаған';
+ return 'Қате шықты: '+(c||'белгісіз')+'. Қайта көр';}
+
 /* ===== STATE ===== */
-let user=null,P=null,authTab='login',play=null;
+let pendingReg=null,me=null,P=null,authTab='login',play=null,lastRank=0;
 const blankP=()=>({xp:0,best:{},stars:{},learned:{},mistakes:{},streak:0,lastDay:'',quizzes:0,badges:[],maxCombo:0,exam:{},cur:'t11'});
-const save=()=>{if(user)S.set(K.p(user),P)};
-const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
-function touchStreak(){const t=today();if(P.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();P.streak=P.lastDay===ys?P.streak+1:1;P.lastDay=t}
-function lvl(xp){let l=1,need=100,acc=0;while(xp>=acc+need){acc+=need;l++;need=100+(l-1)*50}return{l,cur:xp-acc,need,title:TITLES[Math.min(l-1,TITLES.length-1)]}}
+const totalStars=()=>SECTIONS.reduce((a,s)=>a+(P.stars[s.id]||0),0);
+let saveT=null;
+function save(){if(!me)return;S.set(K.cache(me.uid),P);if(!CLOUD){S.set(K.p(me.uid),P);return}clearTimeout(saveT);saveT=setTimeout(pushCloud,1200)}
+function pushCloud(){if(!CLOUD||!fb||!me)return;clearTimeout(saveT);saveT=null;
+ fb.db.collection('players').doc(me.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:totalStars(),learned:Object.keys(P.learned).length,updated:firebase.firestore.FieldValue.serverTimestamp(),p:P},{merge:true}).catch(()=>{});}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&saveT)pushCloud()});
+const dstr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+function touchStreak(){const t=dstr(new Date());if(P.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDay===dstr(y)?P.streak+1:1;P.lastDay=t;if(P.streak>=3)award('streak')}
 const starsFor=p=>p>=100?3:p>=85?2:p>=60?1:0;
 const unlocked=s=>{const a=TBY[s.test].secs,i=a.indexOf(s);return i===0||(P.best[a[i-1].id]||0)>=60};
 const allDone=tid=>TBY[tid].secs.every(s=>(P.stars[s.id]||0)>=1);
@@ -297,9 +371,12 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const L='ABCDE';
 
-function addXP(n){const before=lvl(P.xp).l;P.xp+=n;touchStreak();const after=lvl(P.xp);if(after.l>before)toast('Жаңа деңгей: '+after.l+' · '+after.title+'!');save()}
-function award(id){if(P.badges.includes(id))return;P.badges.push(id);save();const b=BADGES.find(x=>x.id===id);setTimeout(()=>toast('Жетістік: '+b.n),700)}
-let tt;function toast(m){document.querySelector('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2200)}
+function addXP(n){const before=rankOf(P.xp).r.i;P.xp+=n;touchStreak();const now=rankOf(P.xp).r;if(now.i>before){if(now.i>=8)award('batyr');showLevelUp(now)}save()}
+function award(id){if(P.badges.includes(id))return;P.badges.push(id);save();const b=BADGES.find(x=>x.id===id);setTimeout(()=>toast('Жетістік: '+b.n),900)}
+let tt;function toast(m){document.querySelector('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2400)}
+function showLevelUp(r){document.querySelector('.levelup')?.remove();const d=document.createElement('div');d.className='levelup';
+ d.innerHTML=`<div class="box" role="dialog" aria-label="Жаңа атақ">${emblem(r)}<span class="label">Жаңа атақ · ${TIERS[r.tier].n} дәреже</span><h2>${esc(r.n)}</h2><p class="muted">${esc(r.d)}</p><button class="btn block" data-a="closelvl">Алға!</button></div>`;
+ document.body.appendChild(d);d.querySelector('button').focus()}
 
 /* ===== ICONS ===== */
 const IC={
@@ -310,75 +387,106 @@ const IC={
  brain:`<svg viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a3 3 0 0 0-3-1zm6 0a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1" fill="none" stroke="currentColor" stroke-width="2"/></svg>`,
  map:`<svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
  crown:`<svg viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z" fill="currentColor"/></svg>`,
+ shield:`<svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="currentColor"/></svg>`,
  x:`<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`,
  lock:`<svg viewBox="0 0 24 24" width="22" height="22"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>`,
 };
-const starRow=(n,cls='stars')=>`<div class="${cls}">${[0,1,2].map(i=>IC.star(i<n)).join('')}</div>`;
-function ring(p){const r=27,c=2*Math.PI*r;return `<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 30 30)"/></svg>`}
+const starRow=n=>`<div class="stars">${[0,1,2].map(i=>IC.star(i<n)).join('')}</div>`;
+function ring(p){const r=27,c=2*Math.PI*r;return `<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--line)" stroke-width="5"/>${p>0?'':'<!--'}<circle cx="30" cy="30" r="${r}" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 30 30)"/>${p>0?'':'-->'}</svg>`}
+/* Дала көрінісі: тау, төбелер, киіз үй, бүркіт */
+function scene(inner,cls=''){return `<div class="scene ${cls}"><svg class="land" viewBox="0 0 400 170" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+ <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient></defs>
+ <rect width="400" height="170" fill="url(#sky)"/>
+ <g style="opacity:var(--starop)" fill="var(--sun)"><circle cx="40" cy="22" r="1.2"/><circle cx="96" cy="40" r="1"/><circle cx="150" cy="16" r="1.4"/><circle cx="214" cy="34" r="1"/><circle cx="260" cy="14" r="1.2"/><circle cx="372" cy="30" r="1"/><circle cx="190" cy="58" r=".9"/></g>
+ <circle cx="330" cy="46" r="17" fill="var(--sun)"/><circle cx="330" cy="46" r="26" fill="var(--sun)" opacity=".18"/>
+ <path d="M250 50q7-6 14 0q7-6 14 0" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" opacity=".55"/>
+ <path d="M0 112L36 84 62 98 104 62 140 92 178 72 222 100 262 70 300 96 344 76 400 104V170H0Z" fill="var(--mount)"/>
+ <path d="M104 62l-10 9 6-1 4 4 4-4 6 1zM262 70l-8 8 5-1 3 3 3-3 5 1z" fill="#fff" opacity=".7"/>
+ <path d="M0 124Q100 102 200 120T400 114V170H0Z" fill="var(--grass2)"/>
+ <path d="M0 142Q120 120 240 138T400 134V170H0Z" fill="var(--grass)"/>
+ <g transform="translate(300 116)"><path d="M0 18Q20 -6 40 18Z" fill="var(--yurt)"/><rect x="2" y="17" width="36" height="16" fill="var(--yurt)"/><path d="M2 21h36" stroke="var(--gold)" stroke-width="2.4"/><rect x="16" y="22" width="9" height="11" rx="1" fill="var(--gold)"/><circle cx="20" cy="5" r="2.4" fill="none" stroke="var(--gold)" stroke-width="1.5"/></g>
+ <g fill="var(--ink)" opacity=".5"><path d="M60 150c4-3 10-3 13 0l1 6h-2l-1-4h-8l-1 4h-2zM73 146l3-3 2 1-2 3z"/><path d="M92 153c3-2 8-2 10 0l1 4h-2l-.5-3h-6l-.5 3h-2zM102 150l2-2 1.5 1-1.5 2z"/></g>
+</svg><div class="over">${inner}</div></div>`}
 
 /* ===== RENDER ===== */
 const app=document.getElementById('app');
-function render(view,arg){window.scrollTo(0,0);document.querySelector('.sheet-back')?.remove();({auth:vAuth,home:vHome,play:vPlay,cards:vCards,result:vResult,top:vTop,badges:vBadges})[view](arg)}
+function render(view,arg){window.scrollTo(0,0);document.querySelector('.sheet-back')?.remove();({auth:vAuth,home:vHome,play:vPlay,cards:vCards,result:vResult,top:vTop,badges:vBadges,ranks:vRanks})[view](arg)}
 
 function vAuth(){
  const reg=authTab==='reg';
- app.innerHTML=`<div class="auth">
-  <div class="orn"></div>
-  <div class="hero"><span class="label">Тақырыптық тесттер 11 · 12</span><h1>Дала тарихы</h1><p class="muted">Қарахан мен Қарақытай, Керей, Найман, Жалайыр, Қыпшақ. Жатта, тест тапсыр, XP жина және деңгейіңді көтер.</p></div>
+ app.innerHTML=`${scene(`<span class="label">Тақырыптық тесттер 11 · 12</span><h1>Дала тарихы</h1><p>Жатта, тест тапсыр, атақ жина</p>`)}
   <div class="panel" style="display:flex;flex-direction:column;gap:16px">
    <div class="tabs" role="tablist"><button role="tab" aria-selected="${!reg}" data-a="tab" data-t="login">Кіру</button><button role="tab" aria-selected="${reg}" data-a="tab" data-t="reg">Тіркелу</button></div>
    <form id="authf" novalidate>
-    <div class="field"><label for="u">Логин</label><input id="u" autocomplete="username" maxlength="20" placeholder="мысалы: aruzhan07"></div>
-    <div class="field"><label for="pw">Құпиясөз</label><input id="pw" type="password" autocomplete="${reg?'new-password':'current-password'}"></div>
+    ${reg?`<div class="field"><label for="nm">Атың (рейтингте көрінеді)</label><input id="nm" maxlength="24" autocomplete="nickname" placeholder="мысалы: Арсен"></div>`:''}
+    <div class="field"><label for="u">Логин</label><input id="u" autocomplete="username" maxlength="20" autocapitalize="none" spellcheck="false" placeholder="мысалы: arsen07">${reg?'<small>Латын әріптері, сандар, _ . -</small>':''}</div>
+    <div class="field"><label for="pw">Құпиясөз</label><input id="pw" type="password" autocomplete="${reg?'new-password':'current-password'}">${reg?'<small>Кемі 6 таңба</small>':''}</div>
     ${reg?`<div class="field"><label for="pw2">Құпиясөзді қайтала</label><input id="pw2" type="password" autocomplete="new-password"></div>`:''}
     <div class="err" id="err"></div>
-    <button class="btn block" type="submit">${reg?'Тіркелу':'Кіру'}</button>
+    <button class="btn block" type="submit" id="authbtn">${reg?'Тіркелу':'Кіру'}</button>
    </form>
   </div>
-  <p class="muted" style="font-size:.85rem;text-align:center">Аккаунт пен прогресс осы құрылғыдағы браузерде сақталады.</p>
- </div>`;
+  <p class="note">${CLOUD?'Аккаунт кез келген құрылғыдан ашылады, рейтинг бәріне ортақ.':'Қазір аккаунт пен прогресс осы құрылғыда ғана сақталады.'}</p>`;
  document.getElementById('authf').onsubmit=async e=>{
-  e.preventDefault();const err=document.getElementById('err');
+  e.preventDefault();const err=document.getElementById('err'),btn=document.getElementById('authbtn');err.textContent='';
   const u=document.getElementById('u').value.trim(),pw=document.getElementById('pw').value;
-  const users=S.get(K.users)||{};
-  if(u.length<3)return err.textContent='Логин кемі 3 таңбадан тұруы керек';
-  if(pw.length<4)return err.textContent='Құпиясөз кемі 4 таңбадан тұруы керек';
-  const key=u.toLowerCase(),h=await hash(pw);
-  if(reg){
-   if(pw!==document.getElementById('pw2').value)return err.textContent='Құпиясөздер сәйкес келмейді';
-   if(users[key])return err.textContent='Бұл логин бос емес, басқасын таңда';
-   users[key]={name:u,hash:h,created:Date.now()};S.set(K.users,users);S.set(K.p(key),blankP());
-  }else{
-   if(!users[key]||users[key].hash!==h)return err.textContent='Логин немесе құпиясөз қате. Қайта көр';
-  }
-  login(key);toast(reg?'Қош келдің, '+u+'!':'Сәлем, '+users[key].name+'!');
+  const nm=reg?document.getElementById('nm').value.trim():'';
+  if(reg&&nm.length<2)return err.textContent='Атың кемі 2 әріптен тұруы керек';
+  if((reg||CLOUD)&&!/^[a-zA-Z0-9_.-]{3,20}$/.test(u))return err.textContent='Логин: 3–20 таңба, латын әріптері мен сандар';
+  if(pw.length<(reg||CLOUD?6:4))return err.textContent='Құпиясөз кемі 6 таңбадан тұруы керек';
+  if(reg&&pw!==document.getElementById('pw2').value)return err.textContent='Құпиясөздер сәйкес келмейді';
+  btn.disabled=true;btn.textContent='Күте тұр…';
+  try{
+   if(CLOUD){
+    if(reg){pendingReg={name:nm,login:u.toLowerCase()};await fb.auth.createUserWithEmailAndPassword(emailOf(u),pw)}
+    else await fb.auth.signInWithEmailAndPassword(emailOf(u),pw);
+    /* onAuthStateChanged ары қарай жалғастырады */
+   }else{
+    const users=S.get(K.users)||{},key=u.toLowerCase(),h=await hash(pw);
+    if(reg){if(users[key])throw{code:'email-already-in-use'};users[key]={name:nm,hash:h,created:Date.now()};S.set(K.users,users);S.set(K.p(key),blankP())}
+    else if(!users[key]||users[key].hash!==h)throw{code:'invalid-credential'};
+    localLogin(key);
+   }
+  }catch(ex){pendingReg=null;err.textContent=fbErr(ex);btn.disabled=false;btn.textContent=reg?'Тіркелу':'Кіру'}
  };
 }
-function login(key){user=key;P=Object.assign(blankP(),S.get(K.p(key))||{});if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}if(!TBY[P.cur])P.cur='t11';S.set(K.sess,key);render('home')}
-function logout(){S.del(K.sess);user=null;P=null;authTab='login';render('auth')}
+function startSession(){if(!TBY[P.cur])P.cur='t11';if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}lastRank=rankOf(P.xp).r.i;render('home');toast('Сәлем, '+me.name+'!')}
+function localLogin(key){const users=S.get(K.users)||{};me={uid:key,name:users[key]?.name||key};P=Object.assign(blankP(),S.get(K.p(key))||{});S.set(K.sess,key);startSession()}
+async function cloudUser(u){
+ me={uid:u.uid,name:u.displayName||'Ойыншы'};
+ try{const d=await fb.db.collection('players').doc(u.uid).get();
+  if(d.exists){const x=d.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{})}
+  else{if(pendingReg)me.name=pendingReg.name;P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});await fb.db.collection('players').doc(u.uid).set({name:me.name,login:pendingReg?.login||'',xp:P.xp,rank:rankOf(P.xp).r.i,stars:0,learned:0,created:firebase.firestore.FieldValue.serverTimestamp(),p:P});if(pendingReg)u.updateProfile({displayName:me.name}).catch(()=>{});pendingReg=null}
+ }catch(e){P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});toast('Интернет жоқ: прогресс кейін сақталады')}
+ startSession();
+}
+function logout(){if(saveT)pushCloud();if(CLOUD)fb.auth.signOut();else{S.del(K.sess);me=null;P=null;authTab='login';render('auth')}}
 
 function vHome(){
- const users=S.get(K.users)||{},name=users[user]?.name||user,lv=lvl(P.xp),T=TBY[P.cur];
+ const T=TBY[P.cur],R=rankOf(P.xp);
  const learned=Object.keys(P.learned).length,mist=Object.keys(P.mistakes).length,eb=P.exam[T.id]||0,ad=allDone(T.id);
  app.innerHTML=`
- <div class="top"><div class="avatar">${esc(name[0].toUpperCase())}</div><div class="who"><b>${esc(name)}</b><span class="muted" style="font-size:.85rem">${lv.title}</span></div>
+ <div class="top"><div class="avatar">${esc(me.name[0].toUpperCase())}</div><div class="who"><b>${esc(me.name)}</b><span class="muted" style="font-size:.85rem">${esc(R.r.n)} · ${TIERS[R.r.tier].n} дәреже</span></div>
   <span class="chip" title="Күн қатарынан">${IC.fire}${P.streak}</span><button class="linkbtn" data-a="logout">Шығу</button></div>
- <div class="panel lvl"><div class="row"><span class="title">Деңгей ${lv.l}</span><span class="muted" style="font-weight:800;font-variant-numeric:tabular-nums">${lv.cur} / ${lv.need} XP</span></div>
-  <div class="bar"><i style="width:${lv.cur/lv.need*100}%"></i></div>
-  <div class="stats"><div class="stat"><b>${P.xp}</b><span>барлық XP</span></div><div class="stat"><b>${learned}/${ALLQ.length}</b><span>жатталды</span></div><div class="stat"><b>${SECTIONS.reduce((a,s)=>a+(P.stars[s.id]||0),0)}/${SECTIONS.length*3}</b><span>жұлдыз</span></div></div></div>
- <div class="tabs" role="tablist" aria-label="Тест таңдау" style="background:var(--line)">${TESTS.map(t=>`<button role="tab" aria-selected="${t.id===T.id}" data-a="test" data-t="${t.id}">Тест ${t.num}</button>`).join('')}</div>
- <div style="display:flex;flex-direction:column;gap:2px"><span class="label">Тақырыптық тест ${T.num} · ${tq(T.id).length} сұрақ</span><h2>${esc(T.name)}</h2></div>
- <div class="orn"></div>
+ <button class="panel rankcard" data-a="ranks" aria-label="Атақтар тізімін ашу">
+  <div class="rankrow">${emblem(R.r)}<div class="t"><span class="label">Атақ ${R.r.i+1} / ${RANKS.length}</span><b>${esc(R.r.n)}</b><span class="muted" style="font-size:.88rem">${esc(R.r.d)}</span></div></div>
+  <div class="bar"><i style="width:${R.pct}%"></i></div>
+  <div class="barlbl"><span>${P.xp} XP</span><span>${R.nx?'Келесі: '+esc(R.nx.n)+' · '+R.left+' XP қалды':'Ең жоғары атақ!'}</span></div>
+  <div class="stats"><div class="stat"><b>${learned}/${ALLQ.length}</b><span>жатталды</span></div><div class="stat"><b>${totalStars()}/${SECTIONS.length*3}</b><span>жұлдыз</span></div><div class="stat"><b>${P.badges.length}/${BADGES.length}</b><span>жетістік</span></div></div>
+ </button>
+ <div class="tabs" role="tablist" aria-label="Тест таңдау">${TESTS.map(t=>`<button role="tab" aria-selected="${t.id===T.id}" data-a="test" data-t="${t.id}">Тест ${t.num}</button>`).join('')}</div>
+ ${scene(`<span class="label">Тақырыптық тест ${T.num} · ${tq(T.id).length} сұрақ</span><h2>${esc(T.name)}</h2>`,'small')}
  <div class="path">${T.secs.map((s,i)=>{const lk=!unlocked(s),b=P.best[s.id]||0,st=P.stars[s.id]||0;
-  return (i?'<div class="connector"></div>':'')+`<button class="node ${lk?'locked':''} ${st?'done':''}" data-a="open" data-s="${s.id}" ${lk?'aria-label="Құлыпталған: '+esc(s.name)+'"':''}>
+  return (i?'<div class="trail" aria-hidden="true"></div>':'')+`<button class="node ${lk?'locked':''} ${st?'done':''}" data-a="open" data-s="${s.id}" ${lk?'aria-label="Құлыпталған: '+esc(s.name)+'"':''}>
    <div class="disc">${ring(b)}<span>${lk?IC.lock:i+1}</span></div>
    <div class="info"><b>${esc(s.name)}</b><small>${s.qs.length} сұрақ · ${esc(s.sub)}</small>${starRow(st)}</div></button>`}).join('')}
-  <div class="connector"></div>
+  <div class="trail" aria-hidden="true"></div>
   <button class="node ${ad?'':'locked'} ${eb>=85?'done':''}" data-a="exam"><div class="disc">${ring(eb)}<span>${ad?IC.crown.replace('<svg','<svg width="26" height="26"'):IC.lock}</span></div>
    <div class="info"><b>Қорытынды сынақ ${T.num}</b><small>${tq(T.id).length} сұрақ · барлық тақырып</small><small>${eb?'Үздік нәтиже: '+eb+'%':'Барлық бөлімде 1 жұлдыз жина'}</small></div></button>
  </div>
+ <div class="orn"></div>
  <button class="btn ${mist?'gold':'ghost'} block" data-a="review" ${mist?'':'disabled'}>Қателерді қайталау${mist?' · '+mist:''}</button>
- <div class="extra"><button class="btn ghost" data-a="top">Рейтинг</button><button class="btn ghost" data-a="badges">Жетістіктер ${P.badges.length}/${BADGES.length}</button></div>`;
+ <div class="extra"><button class="btn ghost" data-a="top">Рейтинг</button><button class="btn ghost" data-a="badges">Жетістіктер</button></div>`;
 }
 
 function openSheet(id){
@@ -395,30 +503,30 @@ function openSheet(id){
  document.body.appendChild(back);back.querySelector('[data-a="quiz"]').focus();
 }
 
-/* quiz */
+/* тест */
 function startQuiz(mode,secId){
  let list=mode==='review'?Object.keys(P.mistakes).map(k=>QBY[k]).filter(Boolean):mode==='exam'?tq(P.cur):SECBY[secId].qs;
- list=shuffle(list).map(q=>{const order=shuffle(q.o.map((_,i)=>i));return{...q,order}});
- play={mode,sec:secId,test:P.cur,list,i:0,correct:0,combo:0,xp:0,picked:null};render('play');
+ list=shuffle(list).map(q=>({...q,order:shuffle(q.o.map((_,i)=>i))}));
+ play={mode,sec:secId,test:P.cur,list,i:0,correct:0,combo:0,xp:0,bonus:0,picked:null};render('play');
 }
 function vPlay(){
  const p=play,q=p.list[p.i],sec=SECBY[q.sec];
- const pct=p.i/p.list.length*100,ans=p.picked!=null,ok=ans&&p.picked===q.a;
- app.innerHTML=`<div class="playtop"><button class="x" data-a="quit" aria-label="Шығу">${IC.x}</button><div class="bar"><i style="width:${pct}%"></i></div><span class="combo">${p.combo>=2?'x'+p.combo:''}</span></div>
+ const ans=p.picked!=null,ok=ans&&p.picked===q.a;
+ app.innerHTML=`<div class="playtop"><button class="x" data-a="quit" aria-label="Шығу">${IC.x}</button><div class="bar"><i style="width:${p.i/p.list.length*100}%"></i></div><span class="combo">${p.combo>=2?'x'+p.combo:''}</span></div>
  <span class="label">${p.mode==='exam'?'Қорытынды сынақ '+TBY[p.test].num:p.mode==='review'?'Қателер':esc(sec.name)} · ${p.i+1}/${p.list.length}</span>
  ${sec.ctx&&p.mode!=='review'?`<p class="ctx">${esc(sec.ctx)}</p>`:''}
  <p class="q">${esc(q.q)}</p>
  <div class="opts">${q.order.map((oi,k)=>{let c='';if(ans){if(oi===q.a)c='right';else if(oi===p.picked)c='wrong'}
   return `<button class="opt ${c}" data-a="pick" data-o="${oi}" ${ans?'disabled':''}><span class="k">${L[k]}</span><span>${esc(q.o[oi])}</span></button>`}).join('')}</div>
- ${ans?`<div class="feedback ${ok?'ok':'no'}"><b>${ok?'Дұрыс! +'+(10+(p.combo>=3?5:0))+' XP':'Қате'}</b>${ok?'':`<p>Дұрыс жауап: ${esc(q.o[q.a])}</p>`}
+ ${ans?`<div class="feedback ${ok?'ok':'no'}"><b>${ok?'Дұрыс! +'+p.last+' XP':'Қате'}</b>${ok?'':`<p>Дұрыс жауап: ${esc(q.o[q.a])}</p>`}
   <button class="btn block ${ok?'':'gold'}" data-a="next" id="nextb">${p.i+1<p.list.length?'Келесі':'Нәтижені көру'}</button></div>`:''}`;
  if(ans)document.getElementById('nextb').focus();
 }
 function pick(oi){
  const p=play,q=p.list[p.i];if(p.picked!=null)return;p.picked=oi;
- if(oi===q.a){p.correct++;p.combo++;const g=10+(p.combo>=3?5:0);p.xp+=g;addXP(g);delete P.mistakes[q.id];P.maxCombo=Math.max(P.maxCombo,p.combo);if(p.combo>=10)award('combo')}
- else{p.combo=0;P.mistakes[q.id]=true}
- save();vPlay();
+ if(oi===q.a){p.correct++;p.combo++;const g=10+(p.combo>=3?5:0);p.last=g;p.xp+=g;delete P.mistakes[q.id];P.maxCombo=Math.max(P.maxCombo,p.combo);if(p.combo>=10)award('combo');addXP(g)}
+ else{p.combo=0;P.mistakes[q.id]=true;save()}
+ vPlay();
 }
 function next(){const p=play;if(p.i+1<p.list.length){p.i++;p.picked=null;vPlay()}else finish()}
 function finish(){
@@ -426,7 +534,7 @@ function finish(){
  P.quizzes++;award('first');
  if(p.mode==='quiz'){st=starsFor(pct);if(pct>(P.best[p.sec]||0)){P.best[p.sec]=pct;newBest=true}P.stars[p.sec]=Math.max(P.stars[p.sec]||0,st);if(pct===100)award('perfect');if(allDone(SECBY[p.sec].test))award('allsec')}
  if(p.mode==='exam'){st=starsFor(pct);if(pct>(P.exam[p.test]||0)){P.exam[p.test]=pct;newBest=true}if(pct>=85)award('exam')}
- const bonus=st*10;addXP(bonus);p.bonus=bonus;
+ p.bonus=st*10;addXP(p.bonus);
  render('result',{pct,st,newBest});
 }
 function vResult({pct,st,newBest}){
@@ -434,21 +542,23 @@ function vResult({pct,st,newBest}){
  const TS=p.mode==='quiz'?TBY[SECBY[p.sec].test].secs:[],nextIdx=p.mode==='quiz'?TS.indexOf(SECBY[p.sec])+1:-1;
  const canNext=nextIdx>0&&nextIdx<TS.length&&unlocked(TS[nextIdx]);
  const msg=isRev?'Қателер азайды!':pct===100?'Керемет, мінсіз!':pct>=85?'Өте жақсы!':pct>=60?'Жақсы, келесі бөлім ашылды':'Тағы бір рет жаттап көр';
+ const R=rankOf(P.xp);
  app.innerHTML=`<div class="result">
   ${isRev?'':`<div class="bigstars">${[0,1,2].map(i=>`<span class="pop">${IC.star(i<st)}</span>`).join('')}</div>`}
   <h1>${msg}</h1>${newBest?'<span class="chip" style="color:var(--gold)">Жаңа рекорд</span>':''}
   <div class="stats"><div class="stat"><b>${pct}%</b><span>нәтиже</span></div><div class="stat"><b>${p.correct}/${p.list.length}</b><span>дұрыс</span></div><div class="stat"><b>+${p.xp+p.bonus}</b><span>XP</span></div></div>
+  <p class="muted" style="font-weight:700">${R.nx?esc(R.nx.n)+' атағына дейін '+R.left+' XP':'Сен — Қаған!'}</p>
   ${canNext?`<button class="btn block" data-a="open" data-s="${TS[nextIdx].id}">Келесі бөлім: ${esc(TS[nextIdx].name)}</button>`:''}
   ${p.mode==='quiz'&&pct<100?`<button class="btn ${canNext?'ghost':''} block" data-a="cards" data-s="${p.sec}">Карточкамен жаттау</button>`:''}
   ${Object.keys(P.mistakes).length&&!isRev?`<button class="btn gold block" data-a="review">Қателерді қайталау</button>`:''}
   <button class="btn ghost block" data-a="home">Картаға қайту</button></div>`;
 }
 
-/* flashcards */
+/* карточкалар */
 function startCards(secId){play={mode:'cards',sec:secId,deck:shuffle(SECBY[secId].qs),known:0,flip:false,total:SECBY[secId].qs.length};render('cards')}
 function vCards(){
  const p=play,q=p.deck[0],sec=SECBY[p.sec];
- if(!q){app.innerHTML=`<div class="result"><div class="bigstars"><span class="pop" style="color:var(--gold)">${IC.brain.replace('<svg','<svg width="64" height="64"')}</span></div><h1>Бөлім жатталды!</h1><p class="muted">Енді тестпен бекіт — жұлдыз бен XP сонда беріледі.</p>
+ if(!q){app.innerHTML=`<div class="result"><div class="bigstars"><span class="pop" style="color:var(--gold)">${IC.brain.replace('<svg','<svg width="64" height="64"')}</span></div><h1>Бөлім жатталды!</h1><p class="muted">Енді тестпен бекіт — жұлдыз бен көп XP сонда беріледі.</p>
   <button class="btn block" data-a="quiz" data-s="${p.sec}">Тест тапсыру</button><button class="btn ghost block" data-a="home">Картаға қайту</button></div>`;return}
  app.innerHTML=`<div class="playtop"><button class="x" data-a="quit" aria-label="Шығу">${IC.x}</button><div class="bar"><i style="width:${p.known/p.total*100}%"></i></div><span class="combo" style="color:var(--muted)">${p.known}/${p.total}</span></div>
  <span class="label">Жаттау · ${esc(sec.name)}</span>
@@ -456,36 +566,59 @@ function vCards(){
   <div class="face"><p class="q">${esc(q.q)}</p><span class="hint">Жауабын ойлан, сосын бас</span></div>
   <div class="face back"><span class="label">Жауабы</span><p class="ans">${esc(q.o[q.a])}</p><p class="muted" style="font-size:.9rem">${esc(q.q)}</p></div></div></div>
  ${p.flip?`<div class="two"><button class="btn ghost" data-a="dunno">Білмедім</button><button class="btn" data-a="know">Білдім${P.learned[q.id]?'':' · +2 XP'}</button></div>`:`<button class="btn block" data-a="flip">Жауабын көру</button>`}
- <p class="muted" style="font-size:.85rem;text-align:center">«Білмедім» десең, карточка соңына қайта келеді.</p>`;
+ <p class="note">«Білмедім» десең, карточка соңына қайта келеді.</p>`;
 }
-function cardAns(k){const p=play,q=p.deck.shift();if(k){p.known++;if(!P.learned[q.id]){P.learned[q.id]=true;addXP(2);if(Object.keys(P.learned).length>=20)award('memory')}}else p.deck.push(q);p.flip=false;save();vCards()}
+function cardAns(k){const p=play,q=p.deck.shift();if(k){p.known++;if(!P.learned[q.id]){P.learned[q.id]=true;if(Object.keys(P.learned).length>=20)award('memory');addXP(2)}}else p.deck.push(q);p.flip=false;save();vCards()}
 
-/* leaderboard & badges */
-function vTop(){
- const users=S.get(K.users)||{};
- const rows=Object.keys(users).map(k=>({k,name:users[k].name,xp:(S.get(K.p(k))||{}).xp||0})).sort((a,b)=>b.xp-a.xp);
- app.innerHTML=`<div class="nav"><h1>Рейтинг</h1><button class="linkbtn" data-a="home">Артқа</button></div><p class="muted">Осы құрылғыда тіркелген ойыншылар.</p>
- <div class="list">${rows.map((r,i)=>{const lv=lvl(r.xp);return `<div class="li ${r.k===user?'me':''}"><span class="rank">${i+1}</span><div class="avatar" style="width:38px;height:38px;font-size:.95rem">${esc(r.name[0].toUpperCase())}</div><div class="grow"><b>${esc(r.name)}</b><span class="muted" style="font-size:.85rem">Деңгей ${lv.l} · ${lv.title}</span></div><span class="chip">${r.xp} XP</span></div>`}).join('')}</div>`;
+/* рейтинг */
+async function vTop(){
+ app.innerHTML=`<div class="nav"><h1>Рейтинг</h1><button class="linkbtn" data-a="home">Артқа</button></div>
+ <p class="muted">${CLOUD?'Барлық ойыншылар, XP бойынша.':'Ортақ рейтинг әлі қосылмаған — осы құрылғыдағы ойыншылар ғана.'}</p>
+ <div class="list" id="lb"><div class="center" style="min-height:120px">Жүктелуде…</div></div>
+ ${CLOUD?'<button class="btn ghost block" data-a="top">Жаңарту</button>':''}`;
+ let rows=[];
+ try{
+  if(CLOUD){if(saveT)pushCloud();const snap=await fb.db.collection('players').orderBy('xp','desc').limit(100).get();snap.forEach(d=>{const x=d.data();rows.push({k:d.id,name:x.name||'Ойыншы',xp:x.xp||0,stars:x.stars||0})})}
+  else{const users=S.get(K.users)||{};rows=Object.keys(users).map(k=>{const pp=S.get(K.p(k))||{};return{k,name:users[k].name||k,xp:pp.xp||0,stars:SECTIONS.reduce((a,s)=>a+((pp.stars||{})[s.id]||0),0)}}).sort((a,b)=>b.xp-a.xp)}
+ }catch(e){document.getElementById('lb').innerHTML=`<p class="err">Рейтингті жүктеу мүмкін болмады. Интернетті тексеріп, «Жаңарту» бас.</p>`;return}
+ const el=document.getElementById('lb');if(!el)return;
+ if(!rows.length){el.innerHTML='<p class="muted">Әзірге ешкім жоқ. Бірінші бол!</p>';return}
+ const myIdx=rows.findIndex(r=>r.k===me.uid);
+ el.innerHTML=(myIdx>=0?`<p class="muted" style="font-weight:800">Сенің орның: ${myIdx+1} / ${rows.length}</p>`:'')+rows.map((r,i)=>{const R=rankOf(r.xp).r;return `<div class="li ${r.k===me.uid?'me':''} ${i<3?'p'+(i+1):''}"><span class="rank">${i+1}</span>${emblem(R)}<div class="grow"><b>${esc(r.name)}${r.k===me.uid?' (сен)':''}</b><span>${esc(R.n)} · ${r.stars} жұлдыз</span></div><span class="chip">${r.xp} XP</span></div>`}).join('');
+}
+function vRanks(){
+ const R=rankOf(P.xp);
+ app.innerHTML=`<div class="nav"><h1>Атақтар</h1><button class="linkbtn" data-a="home">Артқа</button></div>
+ <p class="muted">16 атақ, 4 дәреже: қола, күміс, алтын, көк. XP тест пен карточкадан жиналады.</p>
+ <div class="list ladder">${TIERS.map((t,ti)=>`<div class="tierhead"><i style="background:${t.c}"></i><span class="label">${t.n} дәреже</span></div>`+RANKS.filter(r=>r.tier===ti).map(r=>{const cur=r.i===R.r.i,lock=P.xp<r.xp;
+  return `<div class="step ${cur?'cur':''} ${lock?'lock':''}">${emblem(r)}<div class="grow"><b>${esc(r.n)}${cur?' · сен осындасың':''}</b><p>${esc(r.d)}</p>${cur&&R.nx?`<div class="bar" style="margin-top:6px"><i style="width:${R.pct}%"></i></div>`:''}</div><span class="xp">${r.xp} XP</span></div>`}).join('')).join('')}</div>`;
 }
 function vBadges(){
  app.innerHTML=`<div class="nav"><h1>Жетістіктер</h1><button class="linkbtn" data-a="home">Артқа</button></div>
  <div class="list">${BADGES.map(b=>`<div class="badge ${P.badges.includes(b.id)?'got':''}"><div class="ic">${IC[b.ic]}</div><div class="grow"><b>${b.n}</b><p class="muted" style="font-size:.88rem">${b.d}</p></div></div>`).join('')}</div>`;
 }
 
-/* events */
+/* оқиғалар */
 document.addEventListener('click',e=>{
  const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,s=t.dataset.s;
- ({tab:()=>{authTab=t.dataset.t;vAuth()},test:()=>{P.cur=t.dataset.t;save();vHome()},logout,home:()=>render('home'),open:()=>{const ts=SECBY[s].test;if(!document.querySelector('.node')||P.cur!==ts){P.cur=ts;save();render('home')}openSheet(s)},close:()=>document.querySelector('.sheet-back')?.remove(),
+ ({tab:()=>{authTab=t.dataset.t;vAuth()},test:()=>{P.cur=t.dataset.t;save();vHome()},logout,home:()=>render('home'),
+  open:()=>{const ts=SECBY[s].test;if(!document.querySelector('.node')||P.cur!==ts){P.cur=ts;save();render('home')}openSheet(s)},close:()=>document.querySelector('.sheet-back')?.remove(),
   quiz:()=>startQuiz('quiz',s),cards:()=>startCards(s),review:()=>startQuiz('review'),exam:()=>allDone(P.cur)?startQuiz('exam'):toast('Алдымен барлық бөлімде 1 жұлдыз жина'),
   pick:()=>pick(+t.dataset.o),next,quit:()=>render('home'),flip:()=>{if(!play.flip){play.flip=true;vCards()}},know:()=>cardAns(true),dunno:()=>cardAns(false),
-  top:()=>render('top'),badges:()=>render('badges')})[a]?.();
+  top:()=>render('top'),badges:()=>render('badges'),ranks:()=>render('ranks'),closelvl:()=>document.querySelector('.levelup')?.remove()})[a]?.();
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelector('.sheet-back')?.remove();if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card')){e.preventDefault();e.target.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('.sheet-back')?.remove();document.querySelector('.levelup')?.remove()}if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card')){e.preventDefault();e.target.click()}});
 
-/* boot */
-const sess=S.get(K.sess);const users0=S.get(K.users)||{};
-if(sess&&users0[sess])login(sess);else render('auth');
+/* іске қосу */
+(async()=>{
+ if(CLOUD){
+  try{const v='10.12.2',b='https://www.gstatic.com/firebasejs/'+v+'/';
+   await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')]);
+   firebase.initializeApp(CFG);fb={auth:firebase.auth(),db:firebase.firestore()};
+   fb.auth.onAuthStateChanged(u=>{if(u){if(!me||me.uid!==u.uid)cloudUser(u)}else{me=null;P=null;render('auth')}});
+  }catch(e){app.innerHTML='<div class="center">Серверге қосылу мүмкін болмады. Интернетті тексеріп, бетті жаңарт.</div>'}
+ }else{const sess=S.get(K.sess),users0=S.get(K.users)||{};if(sess&&users0[sess])localLogin(sess);else render('auth')}
+})();
 </script>
-
 </body>
 </html>
