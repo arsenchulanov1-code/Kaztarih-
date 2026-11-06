@@ -520,6 +520,7 @@ function vPlay(){
  const ans=p.picked!=null,ok=ans&&p.picked===q.a;
  app.innerHTML=`<div class="playtop"><button class="x" data-a="quit" aria-label="Шығу">${IC.x}</button><div class="bar"><i style="width:${p.i/p.list.length*100}%"></i></div><span class="combo">${p.combo>=2?'x'+p.combo:''}</span></div>
  <span class="label">${p.mode==='exam'?'Қорытынды сынақ '+TBY[p.test].num:p.mode==='review'?'Қателер':esc(sec.name)} · ${p.i+1}/${p.list.length}</span>
+ ${p.i===0&&p.picked==null?`<p class="note" style="color:var(--bad);font-weight:700">Тест кезінде беттен шықсаң, тест басынан басталады</p>`:''}
  ${sec.ctx&&p.mode!=='review'?`<p class="ctx">${esc(sec.ctx)}</p>`:''}
  <p class="q">${esc(q.q)}</p>
  <div class="opts">${q.order.map((oi,k)=>{let c='';if(ans){if(oi===q.a)c='right';else if(oi===p.picked)c='wrong'}
@@ -534,9 +535,25 @@ function pick(oi){
  else{p.combo=0;P.mistakes[q.id]=true;save()}
  vPlay();
 }
+/* Тест кезінде беттен шығуға болмайды: шықса — тест басынан басталады, жиналған XP қайтарылады */
+const inTest=()=>!!(play&&play.list&&play.mode!=='cards'&&!play.done&&document.querySelector('.opts'));
+function leftTest(){
+ if(!inTest()||Date.now()-(leftTest.at||0)<1500)return;
+ leftTest.at=Date.now();const p=play;
+ if(p.xp>0){P.xp=Math.max(0,P.xp-p.xp);save()}
+ const mode=p.mode,sec=p.sec;
+ startQuiz(mode,sec);
+ document.querySelector('.levelup')?.remove();const d=document.createElement('div');d.className='levelup';
+ d.innerHTML=`<div class="box" role="alertdialog" aria-label="Тест қайта басталды"><span class="label">Ереже бұзылды</span><h2>Тест басынан басталды</h2><p class="muted">Тест кезінде басқа бетке, қосымшаға немесе терезеге өтуге болмайды. Осы әрекеттегі XP қайтарылды.</p><button class="btn block" data-a="closelvl">Түсіндім</button></div>`;
+ document.body.appendChild(d);d.querySelector('button').focus();
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')leftTest()});
+window.addEventListener('blur',leftTest);
+window.addEventListener('pagehide',leftTest);
+window.addEventListener('beforeunload',e=>{if(inTest()){e.preventDefault();e.returnValue=''}});
 function next(){const p=play;if(p.i+1<p.list.length){p.i++;p.picked=null;vPlay()}else finish()}
 function finish(){
- const p=play,pct=Math.round(p.correct/p.list.length*100);let st=0,newBest=false;
+ const p=play,pct=Math.round(p.correct/p.list.length*100);let st=0,newBest=false;p.done=true;
  P.quizzes++;award('first');
  if(p.mode==='quiz'){st=starsFor(pct);if(pct>(P.best[p.sec]||0)){P.best[p.sec]=pct;newBest=true}P.stars[p.sec]=Math.max(P.stars[p.sec]||0,st);if(pct===100)award('perfect');if(allDone(SECBY[p.sec].test))award('allsec')}
  if(p.mode==='exam'){st=starsFor(pct);if(pct>(P.exam[p.test]||0)){P.exam[p.test]=pct;newBest=true}if(pct>=85)award('exam')}
