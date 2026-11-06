@@ -5,10 +5,23 @@ service cloud.firestore {
       return request.auth != null
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
-    // Рейтинг: аты, XP, атақ — бәріне көрінеді
+    function isInt(v, lo, hi) { return v is int && v >= lo && v <= hi; }
+    // Рейтингтегі жазбаның дұрыс пішіні (накрутканы шектеу)
+    function validPlayer(d) {
+      return d.keys().hasOnly(['name','xp','rank','stars','learned','created','updated'])
+        && d.name is string && d.name.size() >= 1 && d.name.size() <= 24
+        && isInt(d.xp, 0, 1000000)
+        && isInt(d.rank, 0, 15)
+        && isInt(d.stars, 0, 1000)
+        && isInt(d.learned, 0, 10000);
+    }
+
+    // Рейтинг: аты, XP, атақ — бәріне көрінеді (кіруді қажет етпейді)
     match /players/{uid} {
       allow read: if true;
-      allow write: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create, update: if isAdmin()
+        || (request.auth != null && request.auth.uid == uid && validPlayer(request.resource.data));
+      allow delete: if isAdmin() || (request.auth != null && request.auth.uid == uid);
     }
     // Толық прогресс: тек өзі және админдер
     match /progress/{uid} {
