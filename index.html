@@ -181,7 +181,7 @@ input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px 
 .center{display:grid;place-items:center;min-height:50vh;color:var(--muted);font-weight:700}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<script src="firebase-config.js"></script>
+<script src="supabase-config.js"></script>
 </head>
 <body>
 <div id="app" aria-live="polite"><div class="center">Жүктелуде…</div></div>
@@ -337,19 +337,19 @@ const S={get(k){try{const v=localStorage.getItem(k);return v==null?(mem[k]??null
 const K={users:'dt12_users',sess:'dt12_session',p:u=>'dt12_p_'+u,cache:u=>'dt_cache_'+u};
 async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('dt12|'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return 'f'+h}}
 
-/* ===== BACKEND: Firebase (ортақ) немесе осы құрылғы ===== */
-const CFG=window.FIREBASE_CONFIG||{};
-const CLOUD=!!(CFG&&CFG.apiKey);
-let fb=null;
+/* ===== BACKEND: Supabase (ортақ) немесе осы құрылғы ===== */
+const CFG=window.SUPABASE_CONFIG||{};
+const CLOUD=!!(CFG&&CFG.url&&CFG.anonKey);
+let fb=null; /* Supabase клиенті */
 const loadScript=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
 const emailOf=login=>login.toLowerCase()+'@dala-tarihy.kz';
-function fbErr(e){const c=(e&&e.code)||'';
- if(c.includes('email-already-in-use'))return 'Бұл логин бос емес, басқасын таңда';
- if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')||c.includes('invalid-login'))return 'Логин немесе құпиясөз қате. Қайта көр';
- if(c.includes('weak-password'))return 'Құпиясөз кемі 6 таңбадан тұруы керек';
- if(c.includes('network'))return 'Интернет байланысы жоқ. Қосылып, қайта көр';
- if(c.includes('too-many-requests'))return 'Тым көп әрекет. Бір минуттан соң қайта көр';
- if(c.includes('operation-not-allowed'))return 'Firebase-те Email/Password кіру қосылмаған';
+function fbErr(e){const c=((e&&(e.message||e.code))||'').toLowerCase();
+ if(c.includes('already registered')||c.includes('already been registered'))return 'Бұл логин бос емес, басқасын таңда';
+ if(c.includes('invalid login')||c.includes('invalid credentials'))return 'Логин немесе құпиясөз қате. Қайта көр';
+ if(c.includes('password should be')||c.includes('weak'))return 'Құпиясөз кемі 6 таңбадан тұруы керек';
+ if(c.includes('fetch')||c.includes('network'))return 'Интернет байланысы жоқ. Қосылып, қайта көр';
+ if(c.includes('rate limit')||c.includes('too many'))return 'Тым көп әрекет. Бір минуттан соң қайта көр';
+ if(c.includes('confirm')||c.includes('signups not allowed')||c.includes('signup is disabled'))return 'Supabase-те Authentication → Sign In / Providers → Email: «Confirm email» өшірулі болуы керек';
  return 'Қате шықты: '+(c||'белгісіз')+'. Қайта көр';}
 
 /* ===== STATE ===== */
@@ -359,9 +359,9 @@ const totalStars=()=>SECTIONS.reduce((a,s)=>a+(P.stars[s.id]||0),0);
 let saveT=null;
 function save(){if(!me)return;S.set(K.cache(me.uid),P);if(!CLOUD){S.set(K.p(me.uid),P);return}clearTimeout(saveT);saveT=setTimeout(pushCloud,1200)}
 function pushCloud(){if(!CLOUD||!fb||!me)return;clearTimeout(saveT);saveT=null;
- const FV=firebase.firestore.FieldValue;
- fb.db.collection('players').doc(me.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:totalStars(),learned:Object.keys(P.learned).length,updated:FV.serverTimestamp(),p:FV.delete()},{merge:true}).catch(()=>{});
- fb.db.collection('progress').doc(me.uid).set({name:me.name,login:me.login||'',p:P,updated:FV.serverTimestamp()},{merge:true}).catch(()=>{});}
+ const now=new Date().toISOString();
+ fb.from('players').upsert({uid:me.uid,name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:totalStars(),learned:Object.keys(P.learned).length,updated:now}).then(()=>{},()=>{});
+ fb.from('progress').upsert({uid:me.uid,name:me.name,login:me.login||'',p:P,updated:now}).then(()=>{},()=>{});}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&saveT)pushCloud()});
 const dstr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 function touchStreak(){const t=dstr(new Date());if(P.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDay===dstr(y)?P.streak+1:1;P.lastDay=t;if(P.streak>=3)award('streak')}
@@ -440,8 +440,8 @@ function vAuth(){
   btn.disabled=true;btn.textContent='Күте тұр…';
   try{
    if(CLOUD){
-    if(reg){pendingReg={name:nm,login:u.toLowerCase()};await fb.auth.createUserWithEmailAndPassword(emailOf(u),pw)}
-    else await fb.auth.signInWithEmailAndPassword(emailOf(u),pw);
+    if(reg){pendingReg={name:nm,login:u.toLowerCase()};const r=await fb.auth.signUp({email:emailOf(u),password:pw,options:{data:{name:nm}}});if(r.error)throw r.error;if(!r.data.session)throw{message:'confirm email'}}
+    else{const r=await fb.auth.signInWithPassword({email:emailOf(u),password:pw});if(r.error)throw r.error}
     /* onAuthStateChanged ары қарай жалғастырады */
    }else{
     const users=S.get(K.users)||{},key=u.toLowerCase(),h=await hash(pw);
@@ -455,19 +455,17 @@ function vAuth(){
 function startSession(){if(!TBY[P.cur])P.cur='t11';if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}lastRank=rankOf(P.xp).r.i;render('home');toast('Сәлем, '+me.name+'!')}
 function localLogin(key){const users=S.get(K.users)||{};me={uid:key,name:users[key]?.name||key};P=Object.assign(blankP(),S.get(K.p(key))||{});S.set(K.sess,key);startSession()}
 async function cloudUser(u){
- me={uid:u.uid,name:u.displayName||'Ойыншы',login:(u.email||'').split('@')[0],admin:false};
+ me={uid:u.id,name:(u.user_metadata&&u.user_metadata.name)||'Ойыншы',login:(u.email||'').split('@')[0],admin:false};
  try{
-  const [pr,pl,ad]=await Promise.all([fb.db.collection('progress').doc(u.uid).get(),fb.db.collection('players').doc(u.uid).get(),fb.db.collection('admins').doc(u.uid).get().catch(()=>null)]);
-  me.admin=!!(ad&&ad.exists);
-  if(pr.exists){const x=pr.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{})}
-  else if(pl.exists){const x=pl.data();me.name=x.name||me.name;P=Object.assign(blankP(),x.p||{});pushCloud()}
-  else{if(pendingReg)me.name=pendingReg.name;P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});
-   await fb.db.collection('players').doc(u.uid).set({name:me.name,xp:P.xp,rank:rankOf(P.xp).r.i,stars:0,learned:0,created:firebase.firestore.FieldValue.serverTimestamp(),updated:firebase.firestore.FieldValue.serverTimestamp()});
-   pushCloud();if(pendingReg)u.updateProfile({displayName:me.name}).catch(()=>{});pendingReg=null}
- }catch(e){P=Object.assign(blankP(),S.get(K.cache(u.uid))||{});toast('Интернет жоқ: прогресс кейін сақталады')}
+  const [pr,pl,ad]=await Promise.all([fb.from('progress').select('*').eq('uid',u.id).maybeSingle(),fb.from('players').select('*').eq('uid',u.id).maybeSingle(),fb.from('admins').select('uid').eq('uid',u.id).maybeSingle()]);
+  if(pr.error||pl.error)throw pr.error||pl.error;
+  me.admin=!!ad.data;
+  if(pr.data){me.name=pr.data.name||me.name;P=Object.assign(blankP(),pr.data.p||{})}
+  else{if(pendingReg)me.name=pendingReg.name;P=Object.assign(blankP(),S.get(K.cache(u.id))||{});pendingReg=null;pushCloud()}
+ }catch(e){P=Object.assign(blankP(),S.get(K.cache(u.id))||{});toast('Интернет жоқ: прогресс кейін сақталады')}
  startSession();
 }
-function logout(){if(saveT)pushCloud();if(CLOUD)fb.auth.signOut();else{S.del(K.sess);me=null;P=null;authTab='login';render('auth')}}
+function logout(){if(saveT)pushCloud();if(CLOUD)fb.auth.signOut().then(()=>{me=null;P=null;authTab='login';render('auth')});else{S.del(K.sess);me=null;P=null;authTab='login';render('auth')}}
 
 function vHome(){
  const T=TBY[P.cur],R=rankOf(P.xp);
@@ -586,7 +584,7 @@ async function vTop(){
  ${CLOUD?'<button class="btn ghost block" data-a="top">Жаңарту</button>':''}`;
  let rows=[];
  try{
-  if(CLOUD){if(saveT)pushCloud();const snap=await fb.db.collection('players').orderBy('xp','desc').limit(100).get();snap.forEach(d=>{const x=d.data();rows.push({k:d.id,name:x.name||'Ойыншы',xp:x.xp||0,stars:x.stars||0})})}
+  if(CLOUD){if(saveT)pushCloud();const r=await fb.from('players').select('uid,name,xp,stars').order('xp',{ascending:false}).limit(100);if(r.error)throw r.error;r.data.forEach(x=>rows.push({k:x.uid,name:x.name||'Ойыншы',xp:x.xp||0,stars:x.stars||0}))}
   else{const users=S.get(K.users)||{};rows=Object.keys(users).map(k=>{const pp=S.get(K.p(k))||{};return{k,name:users[k].name||k,xp:pp.xp||0,stars:SECTIONS.reduce((a,s)=>a+((pp.stars||{})[s.id]||0),0)}}).sort((a,b)=>b.xp-a.xp)}
  }catch(e){document.getElementById('lb').innerHTML=`<p class="err">Рейтингті жүктеу мүмкін болмады. Интернетті тексеріп, «Жаңарту» бас.</p>`;return}
  const el=document.getElementById('lb');if(!el)return;
@@ -608,18 +606,18 @@ function vBadges(){
 
 
 /* ===== АДМИН ===== */
-const ago=ts=>{if(!ts||!ts.toDate)return '—';const d=ts.toDate(),m=(Date.now()-d)/60000;if(m<2)return 'қазір';if(m<60)return Math.round(m)+' мин бұрын';if(m<1440)return Math.round(m/60)+' сағ бұрын';return Math.round(m/1440)+' күн бұрын'};
+const ago=ts=>{if(!ts)return '—';const d=new Date(ts);if(isNaN(d))return '—';const m=(Date.now()-d)/60000;if(m<2)return 'қазір';if(m<60)return Math.round(m)+' мин бұрын';if(m<1440)return Math.round(m/60)+' сағ бұрын';return Math.round(m/1440)+' күн бұрын'};
 async function vAdmin(){
  if(!me.admin){render('home');return}
  app.innerHTML=`<div class="nav"><h1>Админ панель</h1><button class="linkbtn" data-a="home">Артқа</button></div>
  <div id="adm"><div class="center" style="min-height:120px">Жүктелуде…</div></div>`;
  let players=[],progs=[];
- try{const [a,b]=await Promise.all([fb.db.collection('players').orderBy('xp','desc').limit(500).get(),fb.db.collection('progress').limit(500).get()]);
-  a.forEach(d=>players.push({uid:d.id,...d.data()}));b.forEach(d=>progs.push({uid:d.id,...d.data()}));
+ try{const [a,b]=await Promise.all([fb.from('players').select('*').order('xp',{ascending:false}).limit(500),fb.from('progress').select('*').limit(500)]);if(a.error||b.error)throw a.error||b.error;
+  a.data.forEach(d=>players.push(d));b.data.forEach(d=>progs.push(d));
  }catch(e){document.getElementById('adm').innerHTML='<p class="err">Деректерді оқу мүмкін болмады. Firestore ережелерін (firestore.rules) жаңартқаныңды тексер.</p>';return}
  const el=document.getElementById('adm');if(!el)return;
  const logins=Object.fromEntries(progs.map(x=>[x.uid,x.login||'']));
- const today=players.filter(x=>x.updated&&x.updated.toDate&&(Date.now()-x.updated.toDate())<864e5).length;
+ const today=players.filter(x=>x.updated&&(Date.now()-new Date(x.updated))<864e5).length;
  const avg=players.length?Math.round(players.reduce((a,x)=>a+(x.xp||0),0)/players.length):0;
  const miss={};progs.forEach(x=>Object.keys((x.p&&x.p.mistakes)||{}).forEach(k=>miss[k]=(miss[k]||0)+1));
  const hard=Object.entries(miss).filter(([k])=>QBY[k]).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -636,20 +634,20 @@ async function vPlayer(uid){
  if(!me.admin){render('home');return}
  app.innerHTML=`<div class="nav"><h1>Ойыншы</h1><button class="linkbtn" data-a="admin">Тізімге</button></div><div id="pl"><div class="center" style="min-height:120px">Жүктелуде…</div></div>`;
  let pl,pr,ad;
- try{[pl,pr,ad]=await Promise.all([fb.db.collection('players').doc(uid).get(),fb.db.collection('progress').doc(uid).get(),fb.db.collection('admins').doc(uid).get()])}
+ try{[pl,pr,ad]=await Promise.all([fb.from('players').select('*').eq('uid',uid).maybeSingle(),fb.from('progress').select('*').eq('uid',uid).maybeSingle(),fb.from('admins').select('uid').eq('uid',uid).maybeSingle()]);if(pl.error||pr.error)throw pl.error||pr.error}
  catch(e){document.getElementById('pl').innerHTML='<p class="err">Ойыншыны жүктеу мүмкін болмады.</p>';return}
  const el=document.getElementById('pl');if(!el)return;
- const x=pl.exists?pl.data():{},y=pr.exists?pr.data():{},p=Object.assign(blankP(),y.p||{}),R=rankOf(p.xp||x.xp||0);
+ const x=pl.data||{},y=pr.data||{},p=Object.assign(blankP(),y.p||{}),R=rankOf(p.xp||x.xp||0);
  const mist=Object.keys(p.mistakes).filter(k=>QBY[k]);
  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
-  <div class="panel rankrow">${emblem(R.r)}<div class="t"><b>${esc(x.name||y.name||'Ойыншы')}</b><span class="muted" style="font-size:.88rem">@${esc(y.login||'?')} · ${esc(R.r.n)} · ${p.xp} XP${ad.exists?' · админ':''}</span><span class="muted" style="font-size:.85rem">Соңғы кіру: ${ago(x.updated)}</span></div></div>
+  <div class="panel rankrow">${emblem(R.r)}<div class="t"><b>${esc(x.name||y.name||'Ойыншы')}</b><span class="muted" style="font-size:.88rem">@${esc(y.login||'?')} · ${esc(R.r.n)} · ${p.xp} XP${ad.data?' · админ':''}</span><span class="muted" style="font-size:.85rem">Соңғы кіру: ${ago(x.updated)}</span></div></div>
   <div class="stats"><div class="stat"><b>${p.quizzes}</b><span>тест тапсырды</span></div><div class="stat"><b>${Object.keys(p.learned).length}/${ALLQ.length}</b><span>жатталды</span></div><div class="stat"><b>${p.streak}</b><span>күн қатарынан</span></div></div>
   ${TESTS.map(t=>`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Тест ${t.num} · ${esc(t.name)}</span>
    ${t.secs.map(s=>{const b=p.best[s.id]||0,l=s.qs.filter(q=>p.learned[q.id]).length;return `<div style="display:flex;flex-direction:column;gap:4px"><div class="barlbl" style="color:var(--ink)"><span>${esc(s.name)}</span><span>${b}% ${'★'.repeat(p.stars[s.id]||0)}</span></div><div class="bar"><i style="width:${b}%"></i></div><span class="muted" style="font-size:.8rem">Жатталды ${l}/${s.qs.length}</span></div>`}).join('')}
    <span class="muted" style="font-weight:700;font-size:.88rem">Қорытынды сынақ: ${p.exam[t.id]?p.exam[t.id]+'%':'тапсырмаған'}</span></div>`).join('')}
   <div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Қате жіберген сұрақтары · ${mist.length}</span>
    ${mist.length?mist.map(k=>`<div><b style="font-size:.9rem">${esc(QBY[k].q)}</b><p class="muted" style="font-size:.85rem">Жауабы: ${esc(QBY[k].o[QBY[k].a])}</p></div>`).join(''):'<p class="muted">Қате жоқ</p>'}</div>
-  ${uid===me.uid?'':`<button class="btn ghost block" data-a="${ad.exists?'rmadmin':'mkadmin'}" data-u="${esc(uid)}">${ad.exists?'Админ құқығын алу':'Админ ету'}</button>
+  ${uid===me.uid?'':`<button class="btn ghost block" data-a="${ad.data?'rmadmin':'mkadmin'}" data-u="${esc(uid)}">${ad.data?'Админ құқығын алу':'Админ ету'}</button>
   <button class="btn ghost block" style="color:var(--bad)" data-a="delp" data-u="${esc(uid)}">Рейтингтен өшіру</button>`}
  </div>`;
 }
@@ -658,9 +656,9 @@ async function adminAct(btn,kind){
  if(btn.dataset.sure!=='1'){btn.dataset.sure='1';btn.dataset.txt=btn.textContent;btn.textContent='Сенімдісің бе? Тағы бір рет бас';setTimeout(()=>{if(btn.isConnected){btn.dataset.sure='';btn.textContent=btn.dataset.txt}},4000);return}
  btn.disabled=true;
  try{
-  if(kind==='mk'){await fb.db.collection('admins').doc(uid).set({by:me.uid,at:firebase.firestore.FieldValue.serverTimestamp()});toast('Админ болды')}
-  if(kind==='rm'){await fb.db.collection('admins').doc(uid).delete();toast('Админ құқығы алынды')}
-  if(kind==='del'){await Promise.all([fb.db.collection('players').doc(uid).delete(),fb.db.collection('progress').doc(uid).delete()]);toast('Ойыншы рейтингтен өшірілді');render('admin');return}
+  if(kind==='mk'){{const r=await fb.from('admins').insert({uid,by:me.uid});if(r.error)throw r.error}toast('Админ болды')}
+  if(kind==='rm'){{const r=await fb.from('admins').delete().eq('uid',uid);if(r.error)throw r.error}toast('Админ құқығы алынды')}
+  if(kind==='del'){{const r=await Promise.all([fb.from('players').delete().eq('uid',uid),fb.from('progress').delete().eq('uid',uid)]);if(r.some(x=>x.error))throw r.find(x=>x.error).error}toast('Ойыншы рейтингтен өшірілді');render('admin');return}
   vPlayer(uid);
  }catch(e){btn.disabled=false;toast('Орындалмады: құқық жоқ немесе интернет жоқ')}
 }
@@ -679,10 +677,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelec
 /* іске қосу */
 (async()=>{
  if(CLOUD){
-  try{const v='10.12.2',b='https://www.gstatic.com/firebasejs/'+v+'/';
-   await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')]);
-   firebase.initializeApp(CFG);fb={auth:firebase.auth(),db:firebase.firestore()};
-   fb.auth.onAuthStateChanged(u=>{if(u){if(!me||me.uid!==u.uid)cloudUser(u)}else{me=null;P=null;render('auth')}});
+  try{await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
+   fb=supabase.createClient(CFG.url,CFG.anonKey);
+   fb.auth.onAuthStateChange((ev,sess)=>{const u=sess&&sess.user;if(u){if(!me||me.uid!==u.id)setTimeout(()=>cloudUser(u),0)}else if(ev==='SIGNED_OUT'||ev==='INITIAL_SESSION'){me=null;P=null;render('auth')}});
   }catch(e){app.innerHTML='<div class="center">Серверге қосылу мүмкін болмады. Интернетті тексеріп, бетті жаңарт.</div>'}
  }else{const sess=S.get(K.sess),users0=S.get(K.users)||{};if(sess&&users0[sess])localLogin(sess);else render('auth')}
 })();
