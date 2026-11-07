@@ -166,13 +166,19 @@ input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px 
 .tierhead{display:flex;align-items:center;gap:8px;margin-top:8px}
 .tierhead i{width:12px;height:12px;border-radius:4px}
 .badge{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:var(--surface);border:2px solid var(--line)}
-.badge .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--line);color:var(--muted)}
-.badge.got .ic{background:var(--gold-soft);color:var(--gold)}
-.badge:not(.got){opacity:.6}
-.badge .ic svg{width:24px;height:24px}
+.badge .ic{position:relative;width:56px;height:56px;flex:none}
+.badge .medal{width:56px;height:56px;display:block}
+.badge.got{border-color:var(--gold-soft)}
+.badge.got .medal{filter:drop-shadow(0 3px 4px rgb(0 0 0 / .18))}
+.badge:not(.got) .medal{filter:grayscale(1);opacity:.4}
+.badge:not(.got) b{color:var(--muted)}
+.badge .lk{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--muted);border:2px solid var(--line)}
+.badge .lk svg{width:12px;height:12px}
+.badge .ok{flex:none;font-size:.78rem;font-weight:800;color:var(--ok);background:var(--ok-soft);padding:3px 8px;border-radius:999px}
+.toast .medal{width:30px;height:30px;flex:none}
 .badge .grow{flex:1;min-width:0}
 .nav{display:flex;gap:8px;justify-content:space-between;align-items:center}
-.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:800;z-index:40;animation:tin .3s ease-out;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:800;z-index:40;animation:tin .3s ease-out;max-width:90vw;text-align:center;display:flex;align-items:center;gap:10px}
 @keyframes tin{from{transform:translate(-50%,-20px);opacity:0}}
 .linkbtn{color:var(--accent);font-weight:800;padding:8px 4px}
 .levelup{position:fixed;inset:0;z-index:30;background:rgba(5,12,10,.6);display:grid;place-items:center;padding:20px}
@@ -319,15 +325,27 @@ function rankOf(xp){let r=RANKS[0];for(const x of RANKS)if(xp>=x.xp)r=x;const nx
 function emblem(r,cls='emb'){const c=TIERS[r.tier].c;return `<svg class="${cls}" viewBox="0 0 54 60" aria-hidden="true"><path d="M27 2l23 8v16c0 15-10 26-23 32C14 52 4 41 4 26V10z" fill="${c}"/><path d="M27 7l18 6v13c0 12-8 21-18 26-10-5-18-14-18-26V13z" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/><text x="27" y="36" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-size="16" font-weight="700" fill="#fff">${r.i+1}</text></svg>`}
 
 const BADGES=[
- {id:'first',n:'Алғашқы қадам',d:'Бірінші тестті аяқта',ic:'flag'},
- {id:'perfect',n:'Мінсіз',d:'Бір бөлімді 100% тапсыр',ic:'star'},
- {id:'combo',n:'Тұлпар',d:'Қатарынан 10 дұрыс жауап',ic:'bolt'},
- {id:'memory',n:'Жадыгер',d:'20 карточканы жатта',ic:'brain'},
- {id:'allsec',n:'Дала билеушісі',d:'Бір тесттің барлық бөлімінде кемі 1 жұлдыз',ic:'map'},
- {id:'exam',n:'Ұлы хан',d:'Кез келген қорытынды сынақ — 85%+',ic:'crown'},
- {id:'streak',n:'Көшпенді',d:'3 күн қатарынан ойна',ic:'fire'},
- {id:'batyr',n:'Батыр атағы',d:'«Батыр» атағына жет',ic:'shield'},
+ {id:'first',n:'Алғашқы қадам',d:'Бірінші тестті аяқта',ic:'first',c:['#17804A','#2FB36B']},
+ {id:'perfect',n:'Мінсіз',d:'Бір бөлімді 100% тапсыр',ic:'perfect',c:['#B07A0C','#E6AE2E']},
+ {id:'combo',n:'Тұлпар',d:'Қатарынан 10 дұрыс жауап',ic:'combo',c:['#B4541A','#E8803A']},
+ {id:'memory',n:'Жадыгер',d:'20 карточканы жатта',ic:'memory',c:['#5B3FA8','#8A6BDB']},
+ {id:'allsec',n:'Дала билеушісі',d:'Бір тесттің барлық бөлімінде кемі 1 жұлдыз',ic:'allsec',c:['#007A96','#1FB2D3']},
+ {id:'exam',n:'Ұлы хан',d:'Кез келген қорытынды сынақ — 85%+',ic:'exam',c:['#174F8A','#3485D6']},
+ {id:'streak',n:'Көшпенді',d:'3 күн қатарынан ойна',ic:'streak',c:['#A8302F','#E0544B']},
+ {id:'batyr',n:'Батыр атағы',d:'«Батыр» атағына жет',ic:'batyr',c:['#46535F','#7B8C9B']},
 ];
+/* Медаль иконкалары: 24×24 тор, ақ түсті; d — медаль түсі (ішкі бөлшектерге) */
+const MED={
+ first:d=>`<path d="M1.5 21.5c3.5-3.2 7-4.6 10.5-4.6s7 1.4 10.5 4.6z" fill="#fff"/><path d="M9 17.5V3" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M9 3.5h10l-2.6 3.6L19 10.7H9z" fill="#fff"/><circle cx="12.5" cy="7.1" r="1.3" fill="${d}"/>`,
+ perfect:d=>`<path d="M12 1.8l3 6.2 6.8.9-5 4.7 1.2 6.7L12 17l-6 3.3 1.2-6.7-5-4.7L9 8z" fill="#fff"/><path d="M12 7.2l1.4 2.9 3.2.4-2.3 2.2.6 3.1-2.9-1.6-2.9 1.6.6-3.1-2.3-2.2 3.2-.4z" fill="${d}"/>`,
+ combo:d=>`<path d="M19.5 22.5c.3-6.4-.4-11.6-3.2-15.6l-.2-5-2.5 2.9c-3.4.6-6.6 3.8-9.4 8.2-.6 1-.2 2.2.9 2.6l2 .6c1.3-.2 2.4-.9 3.6-1.5.3 3.2-1.1 5.6-2 7.8z" fill="#fff"/><path d="M16.3 6.9c1.8 2.4 3 6.2 3.2 10.6" stroke="${d}" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-dasharray="1.6 1.8"/><circle cx="11.4" cy="9" r="1.1" fill="${d}"/><path d="M1.5 8.5h3M.8 12h2.4M2 15.5h2.6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>`,
+ memory:d=>`<path d="M2 5.2c3.4-1.5 6.8-1.3 9.3.9v14.4c-2.5-2-5.9-2.3-9.3-.9z" fill="#fff"/><path d="M22 5.2c-3.4-1.5-6.8-1.3-9.3.9v14.4c2.5-2 5.9-2.3 9.3-.9z" fill="#fff"/><path d="M4.4 9c1.6-.5 3.2-.4 4.6.3M4.4 12.2c1.6-.5 3.2-.4 4.6.3M15 9.3c1.4-.7 3-.8 4.6-.3M15 12.5c1.4-.7 3-.8 4.6-.3" stroke="${d}" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M17 1.5l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#fff"/>`,
+ allsec:d=>`<path d="M2.5 12.5C4.5 7.6 8 5.2 12 5.2s7.5 2.4 9.5 7.3z" fill="#fff"/><rect x="4" y="12.5" width="16" height="8" rx=".6" fill="#fff"/><path d="M4 15.2h16" stroke="${d}" stroke-width="1" stroke-dasharray="1.4 1.2"/><path d="M10 20.5v-4.3a2 2 0 0 1 4 0v4.3z" fill="${d}"/><path d="M12 5.2V2.4l3.4 1.2-3.4 1.2" fill="#fff" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M1 21.5h22" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`,
+ exam:d=>`<path d="M2.5 8l4.6 4.3L12 4.5l4.9 7.8L21.5 8l-2 10.5h-15z" fill="#fff"/><rect x="4.5" y="19.3" width="15" height="2.4" rx="1.2" fill="#fff"/><circle cx="12" cy="13.6" r="1.8" fill="${d}"/><circle cx="7.4" cy="15.4" r="1.1" fill="${d}"/><circle cx="16.6" cy="15.4" r="1.1" fill="${d}"/><circle cx="2.5" cy="7.4" r="1.4" fill="#fff"/><circle cx="12" cy="3.6" r="1.4" fill="#fff"/><circle cx="21.5" cy="7.4" r="1.4" fill="#fff"/>`,
+ streak:d=>`<path d="M12 1.5c1.2 4.2 6.2 6 6.2 12a6.2 6.2 0 0 1-12.4 0c0-3 1.4-4.9 3-6.1 0 2.4 1.1 3.6 2.4 3.6 0-3.6-1-6.8.8-9.5z" fill="#fff"/><path d="M12 11.5c.6 2 3 2.9 3 5.8a3 3 0 0 1-6 0c0-1.5.7-2.4 1.5-3 0 1.1.5 1.7 1.1 1.7 0-1.7-.4-3.2.4-4.5z" fill="${d}"/><path d="M4 22.5l16-3M20 22.5l-16-3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`,
+ batyr:d=>`<path d="M3 2.5l18 19M21 2.5l-18 19" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M2.2 1.6l3.4 1.1-1.2 1.6zM21.8 1.6l-3.4 1.1 1.2 1.6z" fill="#fff"/><path d="M12 4.5l6.5 2.4v5c0 4.2-2.8 7.4-6.5 9-3.7-1.6-6.5-4.8-6.5-9v-5z" fill="#fff"/><path d="M12 8l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.3-2.4 1.3.5-2.6-1.9-1.8 2.6-.4z" fill="${d}"/>`,
+};
+function medal(b,cls='medal'){const [d,l]=b.c;return `<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="${d}"/><circle cx="32" cy="32" r="26.5" fill="${l}"/><circle cx="32" cy="32" r="29" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray=".1 4.55" stroke-linecap="round"/><path d="M10 26a23 23 0 0 1 22-20.5" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/><g transform="translate(16 16) scale(1.333)">${MED[b.ic](d)}</g></svg>`}
 
 /* ===== STORAGE ===== */
 const mem={};
@@ -374,8 +392,8 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random(
 const L='ABCDE';
 
 function addXP(n){const before=rankOf(P.xp).r.i;P.xp+=n;touchStreak();const now=rankOf(P.xp).r;if(now.i>before){if(now.i>=8)award('batyr');showLevelUp(now)}save()}
-function award(id){if(P.badges.includes(id))return;P.badges.push(id);save();const b=BADGES.find(x=>x.id===id);setTimeout(()=>toast('Жетістік: '+b.n),900)}
-let tt;function toast(m){document.querySelector('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2400)}
+function award(id){if(P.badges.includes(id))return;P.badges.push(id);save();const b=BADGES.find(x=>x.id===id);setTimeout(()=>toast('Жетістік: '+b.n,medal(b)),900)}
+let tt;function toast(m,ic=''){document.querySelector('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.innerHTML=ic+'<span>'+esc(m)+'</span>';document.body.appendChild(t);clearTimeout(tt);tt=setTimeout(()=>t.remove(),2400)}
 function showLevelUp(r){document.querySelector('.levelup')?.remove();const d=document.createElement('div');d.className='levelup';
  d.innerHTML=`<div class="box" role="dialog" aria-label="Жаңа атақ">${emblem(r)}<span class="label">Жаңа атақ · ${TIERS[r.tier].n} дәреже</span><h2>${esc(r.n)}</h2><p class="muted">${esc(r.d)}</p><button class="btn block" data-a="closelvl">Алға!</button></div>`;
  document.body.appendChild(d);d.querySelector('button').focus()}
@@ -618,7 +636,7 @@ function vRanks(){
 }
 function vBadges(){
  app.innerHTML=`<div class="nav"><h1>Жетістіктер</h1><button class="linkbtn" data-a="home">Артқа</button></div>
- <div class="list">${BADGES.map(b=>`<div class="badge ${P.badges.includes(b.id)?'got':''}"><div class="ic">${IC[b.ic]}</div><div class="grow"><b>${b.n}</b><p class="muted" style="font-size:.88rem">${b.d}</p></div></div>`).join('')}</div>`;
+ <div class="list">${BADGES.map(b=>{const g=P.badges.includes(b.id);return `<div class="badge ${g?'got':''}"><div class="ic">${medal(b)}${g?'':`<span class="lk">${IC.lock}</span>`}</div><div class="grow"><b>${b.n}</b><p class="muted" style="font-size:.88rem">${b.d}</p></div>${g?'<span class="ok">Алынды</span>':''}</div>`}).join('')}</div>`;
 }
 
 
