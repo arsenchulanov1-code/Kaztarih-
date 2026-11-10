@@ -122,6 +122,9 @@ input{font:inherit;min-height:50px;padding:0 14px;border-radius:12px;border:2px 
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft);box-shadow:0 3px 0 var(--bad)}
 .opt.wrong .k{border-color:var(--bad);color:var(--bad)}
 .opt:disabled{cursor:default}
+.opt.chosen{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 3px 0 var(--accent)}
+.opt.chosen .k{border-color:var(--accent);color:var(--accent)}
+.feedback.neutral{background:var(--accent-soft);color:var(--accent)}
 .feedback{border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .feedback.ok{background:var(--ok-soft);color:var(--ok)}
 .feedback.no{background:var(--bad-soft);color:var(--bad)}
@@ -555,9 +558,9 @@ function vPlay(){
  ${sec.ctx&&p.mode!=='review'?`<p class="ctx">${esc(sec.ctx)}</p>`:''}
  <p class="q">${esc(q.q)}</p>
  <div class="opts">${q.order.map((oi,k)=>{let c='';if(ans){if(oi===q.a)c='right';else if(oi===p.picked)c='wrong'}
-  if(p.one&&ans)c=oi===p.picked?'right':'';
+  if(p.one&&ans)c=oi===p.picked?'chosen':'';
   return `<button class="opt ${c}" data-a="pick" data-o="${oi}" ${ans?'disabled':''}><span class="k">${L[k]}</span><span>${esc(q.o[oi])}</span></button>`}).join('')}</div>
- ${ans&&p.one?`<div class="feedback ok"><b>Жауап қабылданды</b><p>Нәтиже тест соңында көрсетіледі.</p>
+ ${ans&&p.one?`<div class="feedback neutral"><b>Жауап қабылданды</b><p>Нәтиже тест соңында көрсетіледі.</p>
   <button class="btn block" data-a="next" id="nextb">${p.i+1<p.list.length?'Келесі':'Нәтижені көру'}</button></div>`
  :ans?`<div class="feedback ${ok?'ok':'no'}"><b>${ok?(p.last?'Дұрыс! +'+p.last+' XP':'Дұрыс!'):'Қате'}</b>${ok?'':`<p>Дұрыс жауап: ${esc(q.o[q.a])}</p>`}
   <button class="btn block ${ok?'':'gold'}" data-a="next" id="nextb">${p.i+1<p.list.length?'Келесі':'Нәтижені көру'}</button></div>`:''}`;
