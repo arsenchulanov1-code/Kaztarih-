@@ -283,7 +283,7 @@ const S12=[
 ['Батыс Түрік қағанатының ордасы:',['Янгикент','Суяб','Имақия','Сығанақ'],1],
 ['Оғыз мемлекетінің ордасы:',['Янгикент','Суяб','Имақия','Сығанақ'],0],
 ]},
-{id:'text',name:'Мәтінмен жұмыс',sub:'Ортағасырлық қалалар, сәулет',ctx:'Ежелгі түркілер, түргеш, қарлұқтар заманында қала мен далада сәулет ескерткіштері салынды. Суяб пен Науакенттегі қазбада будда храмдарының орындары табылды. Жамбыл облысында қарлұқ дәуірінің ескерткіші — Ақыртас ғимараты бар. Қаратау баурайында VI–VIII ғ. Баладж қаласы болған.',qs:[
+{id:'text',oneShot:true,name:'Мәтінмен жұмыс',sub:'Ортағасырлық қалалар, сәулет · 1 әрекет',ctx:'Ежелгі түркілер, түргеш, қарлұқтар заманында қала мен далада сәулет ескерткіштері салынды. Суяб пен Науакенттегі қазбада будда храмдарының орындары табылды. Жамбыл облысында қарлұқ дәуірінің ескерткіші — Ақыртас ғимараты бар. Қаратау баурайында VI–VIII ғ. Баладж қаласы болған.',qs:[
 ['Мәтін бойынша теңге шығарылған Жетісудағы ортағасырлық қала:',['Кедер','Жамукет','Науакент','Суяб'],3],
 ['Будда храмы табылған Суяб қаласы орналасқан аймақ:',['Ертіс бойы','Есіл бойы','Маңғыстау','Жетісу'],3],
 ['Қазба жұмыстары кезінде будда храмдарының орындары табылған қалалар:',['Суяб пен Науакент','Суяб пен Отырар','Науакент пен Сауран','Суяб пен Тараз'],0],
@@ -372,7 +372,9 @@ function fbErr(e){const c=((e&&(e.message||e.code))||'').toLowerCase();
 
 /* ===== STATE ===== */
 let pendingReg=null,me=null,P=null,authTab='login',play=null,lastRank=0;
-const blankP=()=>({xp:0,best:{},stars:{},learned:{},mistakes:{},streak:0,lastDay:'',quizzes:0,badges:[],maxCombo:0,exam:{},cur:'t11'});
+const blankP=()=>({xp:0,best:{},stars:{},learned:{},mistakes:{},streak:0,lastDay:'',quizzes:0,badges:[],maxCombo:0,exam:{},cur:'t11',xpDone:{},attempts:{},oneShot:{}});
+/* XP әр деңгейден бір рет: бөлім (sec id) немесе қорытынды сынақ ('exam:t11'). Қайта тапсыру прогресс береді, XP бермейді */
+const xpKey=(mode,sec,test)=>mode==='exam'?'exam:'+test:mode==='quiz'?sec:null;
 const totalStars=()=>SECTIONS.reduce((a,s)=>a+(P.stars[s.id]||0),0);
 let saveT=null;
 function save(){if(!me)return;S.set(K.cache(me.uid),P);if(!CLOUD){S.set(K.p(me.uid),P);return}clearTimeout(saveT);saveT=setTimeout(pushCloud,1200)}
@@ -385,7 +387,7 @@ const dstr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 function touchStreak(){const t=dstr(new Date());if(P.lastDay===t)return;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDay===dstr(y)?P.streak+1:1;P.lastDay=t;if(P.streak>=3)award('streak')}
 const starsFor=p=>p>=100?3:p>=85?2:p>=60?1:0;
 const unlocked=s=>{const a=TBY[s.test].secs,i=a.indexOf(s);return i===0||(P.best[a[i-1].id]||0)>=60};
-const allDone=tid=>TBY[tid].secs.every(s=>(P.stars[s.id]||0)>=1);
+const allDone=tid=>TBY[tid].secs.every(s=>s.oneShot?!!P.oneShot[s.id]:(P.stars[s.id]||0)>=1);
 const tq=tid=>TBY[tid].secs.flatMap(s=>s.qs);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -470,7 +472,12 @@ function vAuth(){
   }catch(ex){pendingReg=null;err.textContent=fbErr(ex);btn.disabled=false;btn.textContent=reg?'Тіркелу':'Кіру'}
  };
 }
-function startSession(){if(!TBY[P.cur])P.cur='t11';if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}lastRank=rankOf(P.xp).r.i;render('home');toast('Сәлем, '+me.name+'!')}
+function migrateP(){
+ if(!P.v2){P.v2=true;P.xpDone=P.xpDone||{};SECTIONS.forEach(s=>{if((P.best[s.id]||0)>0)P.xpDone[s.id]=true});Object.keys(P.exam||{}).forEach(t=>{if(P.exam[t]>0)P.xpDone['exam:'+t]=true})}
+ P.attempts=P.attempts||{};P.oneShot=P.oneShot||{};
+ SECTIONS.filter(s=>s.oneShot).forEach(s=>{if(!P.oneShot[s.id]&&(P.best[s.id]||0)>0)P.oneShot[s.id]={pct:P.best[s.id],correct:Math.round(P.best[s.id]*s.qs.length/100),total:s.qs.length,at:'',legacy:true}});
+}
+function startSession(){migrateP();if(!TBY[P.cur])P.cur='t11';if(P.examBest){P.exam.t12=Math.max(P.exam.t12||0,P.examBest);delete P.examBest}lastRank=rankOf(P.xp).r.i;render('home');toast('Сәлем, '+me.name+'!')}
 function localLogin(key){const users=S.get(K.users)||{};me={uid:key,name:users[key]?.name||key};P=Object.assign(blankP(),S.get(K.p(key))||{});S.set(K.sess,key);startSession()}
 async function cloudUser(u){
  me={uid:u.id,name:(u.user_metadata&&u.user_metadata.name)||'Ойыншы',login:(u.email||'').split('@')[0],admin:false};
@@ -502,10 +509,10 @@ function vHome(){
  <div class="path">${T.secs.map((s,i)=>{const lk=!unlocked(s),b=P.best[s.id]||0,st=P.stars[s.id]||0;
   return (i?'<div class="trail" aria-hidden="true"></div>':'')+`<button class="node ${lk?'locked':''} ${st?'done':''}" data-a="open" data-s="${s.id}" ${lk?'aria-label="Құлыпталған: '+esc(s.name)+'"':''}>
    <div class="disc">${ring(b)}<span>${lk?IC.lock:i+1}</span></div>
-   <div class="info"><b>${esc(s.name)}</b><small>${s.qs.length} сұрақ · ${esc(s.sub)}</small>${starRow(st)}</div></button>`}).join('')}
+   <div class="info"><b>${esc(s.name)}</b><small>${s.qs.length} сұрақ · ${esc(s.sub)}</small>${s.oneShot&&P.oneShot[s.id]?`<small>Тапсырылды: ${P.oneShot[s.id].correct}/${P.oneShot[s.id].total}</small>`:starRow(st)}</div></button>`}).join('')}
   <div class="trail" aria-hidden="true"></div>
   <button class="node ${ad?'':'locked'} ${eb>=85?'done':''}" data-a="exam"><div class="disc">${ring(eb)}<span>${ad?IC.crown.replace('<svg','<svg width="26" height="26"'):IC.lock}</span></div>
-   <div class="info"><b>Қорытынды сынақ ${T.num}</b><small>${tq(T.id).length} сұрақ · барлық тақырып</small><small>${eb?'Үздік нәтиже: '+eb+'%':'Барлық бөлімде 1 жұлдыз жина'}</small></div></button>
+   <div class="info"><b>Қорытынды сынақ ${T.num}</b><small>${tq(T.id).length} сұрақ · барлық тақырып</small><small>${eb?'Үздік нәтиже: '+eb+'%'+(P.xpDone['exam:'+T.id]?' · XP алынды':''):'Барлық бөлімде 1 жұлдыз жина'}</small></div></button>
  </div>
  <div class="orn"></div>
  <button class="btn ${mist?'gold':'ghost'} block" data-a="review" ${mist?'':'disabled'}>Қателерді қайталау${mist?' · '+mist:''}</button>
@@ -521,35 +528,47 @@ function openSheet(id){
  back.innerHTML=`<div class="sheet" role="dialog" aria-label="${esc(s.name)}"><span class="label">Тест ${TBY[s.test].num} · ${i+1}-бөлім</span><h2>${esc(s.name)}</h2>
   <div class="meta"><span class="chip">Жатталды ${learned}/${s.qs.length}</span><span class="chip">Үздік ${P.best[s.id]||0}%</span>${starRow(P.stars[s.id]||0)}</div>
   <button class="btn ghost block" data-a="cards" data-s="${id}">Жаттау · карточкалар</button>
-  <button class="btn block" data-a="quiz" data-s="${id}">Тест тапсыру · +10 XP әр жауапқа</button>
+  ${s.oneShot&&P.oneShot[id]?`<button class="btn block" disabled>Тапсырылды: ${P.oneShot[id].correct}/${P.oneShot[id].total} · ${P.oneShot[id].pct}%</button><p class="note">Бұл деңгейге бір ғана әрекет беріледі.</p>`
+   :s.oneShot?`<button class="btn block" data-a="quiz" data-s="${id}">Тест тапсыру · бір ғана әрекет</button><p class="note">Жауаптар бірден тексерілмейді. Басталған тестті қайта тапсыруға болмайды, беттен шықсаң тест аяқталады.</p>`
+   :P.xpDone[id]?`<button class="btn block" data-a="quiz" data-s="${id}">Қайта тапсыру · XP берілмейді</button><p class="note">XP әр деңгейден бір рет беріледі. Жұлдыз бен үздік нәтиже жаңарады.</p>`
+   :`<button class="btn block" data-a="quiz" data-s="${id}">Тест тапсыру · +10 XP әр жауапқа</button><p class="note">XP тек бірінші әрекетке беріледі.</p>`}
   <button class="linkbtn" data-a="close">Жабу</button></div>`;
  back.addEventListener('click',e=>{if(e.target===back)back.remove()});
- document.body.appendChild(back);back.querySelector('[data-a="quiz"]').focus();
+ document.body.appendChild(back);(back.querySelector('[data-a="quiz"]')||back.querySelector('[data-a="close"]')).focus();
 }
 
 /* тест */
 function startQuiz(mode,secId){
  let list=mode==='review'?Object.keys(P.mistakes).map(k=>QBY[k]).filter(Boolean):mode==='exam'?tq(P.cur):SECBY[secId].qs;
+ const one=mode==='quiz'&&!!SECBY[secId].oneShot;
+ if(one&&P.oneShot[secId]){toast('Бұл деңгейге бір ғана әрекет беріледі');render('home');return}
  list=shuffle(list).map(q=>({...q,order:shuffle(q.o.map((_,i)=>i))}));
- play={mode,sec:secId,test:P.cur,list,i:0,correct:0,combo:0,xp:0,bonus:0,picked:null};render('play');
+ const key=xpKey(mode,secId,P.cur);
+ play={mode,sec:secId,test:P.cur,list,i:0,correct:0,combo:0,xp:0,bonus:0,picked:null,key,earn:!!key&&!P.xpDone[key],one,started:false,answers:{}};render('play');
 }
 function vPlay(){
  const p=play,q=p.list[p.i],sec=SECBY[q.sec];
  const ans=p.picked!=null,ok=ans&&p.picked===q.a;
  app.innerHTML=`<div class="playtop"><button class="x" data-a="quit" aria-label="Шығу">${IC.x}</button><div class="bar"><i style="width:${p.i/p.list.length*100}%"></i></div><span class="combo">${p.combo>=2?'x'+p.combo:''}</span></div>
  <span class="label">${p.mode==='exam'?'Қорытынды сынақ '+TBY[p.test].num:p.mode==='review'?'Қателер':esc(sec.name)} · ${p.i+1}/${p.list.length}</span>
- ${p.i===0&&p.picked==null?`<p class="note" style="color:var(--bad);font-weight:700">Тест кезінде беттен шықсаң, тест басынан басталады</p>`:''}
+ ${p.i===0&&p.picked==null?`<p class="note" style="color:var(--bad);font-weight:700">${p.one?'Бір ғана әрекет: беттен шықсаң немесе тоқтатсаң, тест аяқталады':'Тест кезінде беттен шықсаң, тест басынан басталады'}</p>${p.key&&!p.earn&&!p.one?'<p class="note">Қайта тапсыру: XP берілмейді</p>':''}${p.mode==='review'?'<p class="note">Қателерді қайталау: XP берілмейді</p>':''}`:''}
  ${sec.ctx&&p.mode!=='review'?`<p class="ctx">${esc(sec.ctx)}</p>`:''}
  <p class="q">${esc(q.q)}</p>
  <div class="opts">${q.order.map((oi,k)=>{let c='';if(ans){if(oi===q.a)c='right';else if(oi===p.picked)c='wrong'}
+  if(p.one&&ans)c=oi===p.picked?'right':'';
   return `<button class="opt ${c}" data-a="pick" data-o="${oi}" ${ans?'disabled':''}><span class="k">${L[k]}</span><span>${esc(q.o[oi])}</span></button>`}).join('')}</div>
- ${ans?`<div class="feedback ${ok?'ok':'no'}"><b>${ok?'Дұрыс! +'+p.last+' XP':'Қате'}</b>${ok?'':`<p>Дұрыс жауап: ${esc(q.o[q.a])}</p>`}
+ ${ans&&p.one?`<div class="feedback ok"><b>Жауап қабылданды</b><p>Нәтиже тест соңында көрсетіледі.</p>
+  <button class="btn block" data-a="next" id="nextb">${p.i+1<p.list.length?'Келесі':'Нәтижені көру'}</button></div>`
+ :ans?`<div class="feedback ${ok?'ok':'no'}"><b>${ok?(p.last?'Дұрыс! +'+p.last+' XP':'Дұрыс!'):'Қате'}</b>${ok?'':`<p>Дұрыс жауап: ${esc(q.o[q.a])}</p>`}
   <button class="btn block ${ok?'':'gold'}" data-a="next" id="nextb">${p.i+1<p.list.length?'Келесі':'Нәтижені көру'}</button></div>`:''}`;
  if(ans)document.getElementById('nextb').focus();
 }
 function pick(oi){
  const p=play,q=p.list[p.i];if(p.picked!=null)return;p.picked=oi;
- if(oi===q.a){p.correct++;p.combo++;const g=10+(p.combo>=3?5:0);p.last=g;p.xp+=g;delete P.mistakes[q.id];P.maxCombo=Math.max(P.maxCombo,p.combo);if(p.combo>=10)award('combo');addXP(g)}
+ if(!p.started){p.started=true;if(p.key){P.attempts[p.key]=(P.attempts[p.key]||0)+1;if(p.earn)P.xpDone[p.key]=true}}
+ if(p.one)p.answers[q.id]=oi;
+ if(oi===q.a){p.correct++;p.combo++;const g=p.earn?10+(p.combo>=3?5:0):0;p.last=g;p.xp+=g;delete P.mistakes[q.id];P.maxCombo=Math.max(P.maxCombo,p.combo);if(p.combo>=10)award('combo');
+  if(g&&!p.one)addXP(g);else{touchStreak();save()}}
  else{p.combo=0;P.mistakes[q.id]=true;save()}
  vPlay();
 }
@@ -558,7 +577,10 @@ const inTest=()=>!!(play&&play.list&&play.mode!=='cards'&&!play.done&&document.q
 function leftTest(){
  if(!inTest()||Date.now()-(leftTest.at||0)<1500)return;
  leftTest.at=Date.now();const p=play;
- if(p.xp>0){P.xp=Math.max(0,P.xp-p.xp);save()}
+ if(p.one){if(p.started){p.xp=0;p.earn=false;closeOneShot('Тест аяқталды','Бір ғана әрекет берілетін деңгейде беттен шығуға болмайды. Жауап берілмеген сұрақтар қате саналды, XP берілмеді.')}else render('home');return}
+ if(p.xp>0&&!p.one){P.xp=Math.max(0,P.xp-p.xp)}
+ if(p.started&&p.key){P.attempts[p.key]=Math.max(0,(P.attempts[p.key]||1)-1);if(p.earn)delete P.xpDone[p.key]}
+ save();
  const mode=p.mode,sec=p.sec;
  startQuiz(mode,sec);
  document.querySelector('.levelup')?.remove();const d=document.createElement('div');d.className='levelup';
@@ -569,28 +591,42 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('blur',leftTest);
 window.addEventListener('pagehide',leftTest);
 window.addEventListener('beforeunload',e=>{if(inTest()){e.preventDefault();e.returnValue=''}});
+/* Бір әрекетті деңгей: тоқтатса немесе беттен шықса, жауап берілмегендер қате болып, нәтиже сақталады */
+function closeOneShot(title,text){
+ const p=play;finish();
+ document.querySelector('.levelup')?.remove();const d=document.createElement('div');d.className='levelup';
+ d.innerHTML=`<div class="box" role="alertdialog" aria-label="${esc(title)}"><span class="label">Бір ғана әрекет</span><h2>${esc(title)}</h2><p class="muted">${esc(text)}</p><button class="btn block" data-a="closelvl">Түсіндім</button></div>`;
+ document.body.appendChild(d);d.querySelector('button').focus();
+}
+function quitPlay(){const p=play;if(p&&p.one&&p.started&&!p.done){closeOneShot('Тест аяқталды','Жауап берілмеген сұрақтар қате саналды.');return}render('home')}
 function next(){const p=play;if(p.i+1<p.list.length){p.i++;p.picked=null;vPlay()}else finish()}
 function finish(){
  const p=play,pct=Math.round(p.correct/p.list.length*100);let st=0,newBest=false;p.done=true;
  P.quizzes++;award('first');
+ if(p.one)P.oneShot[p.sec]={pct,correct:p.correct,total:p.list.length,at:new Date().toISOString(),answers:p.answers};
  if(p.mode==='quiz'){st=starsFor(pct);if(pct>(P.best[p.sec]||0)){P.best[p.sec]=pct;newBest=true}P.stars[p.sec]=Math.max(P.stars[p.sec]||0,st);if(pct===100)award('perfect');if(allDone(SECBY[p.sec].test))award('allsec')}
  if(p.mode==='exam'){st=starsFor(pct);if(pct>(P.exam[p.test]||0)){P.exam[p.test]=pct;newBest=true}if(pct>=85)award('exam')}
- p.bonus=st*10;addXP(p.bonus);
+ p.bonus=p.earn?st*10:0;
+ if(p.one)addXP(p.xp+p.bonus);else if(p.bonus)addXP(p.bonus);else save();
  render('result',{pct,st,newBest});
 }
+function oneShotRows(secId,r){const a=(r&&r.answers)||{};return SECBY[secId].qs.map(q=>{const g=a[q.id],ok=g===q.a;
+ return `<div><b style="font-size:.9rem">${ok?'✓':'✗'} ${esc(q.q)}</b><p class="muted" style="font-size:.85rem">${g==null?'Жауап жоқ':'Жауабы: '+esc(q.o[g])}${ok?'':' · Дұрыс: '+esc(q.o[q.a])}</p></div>`}).join('')}
 function vResult({pct,st,newBest}){
  const p=play,isRev=p.mode==='review';
  const TS=p.mode==='quiz'?TBY[SECBY[p.sec].test].secs:[],nextIdx=p.mode==='quiz'?TS.indexOf(SECBY[p.sec])+1:-1;
  const canNext=nextIdx>0&&nextIdx<TS.length&&unlocked(TS[nextIdx]);
- const msg=isRev?'Қателер азайды!':pct===100?'Керемет, мінсіз!':pct>=85?'Өте жақсы!':pct>=60?'Жақсы, келесі бөлім ашылды':'Тағы бір рет жаттап көр';
+ const msg=p.one?'Деңгей тапсырылды':isRev?'Қателер азайды!':pct===100?'Керемет, мінсіз!':pct>=85?'Өте жақсы!':pct>=60?'Жақсы, келесі бөлім ашылды':'Тағы бір рет жаттап көр';
  const R=rankOf(P.xp);
  app.innerHTML=`<div class="result">
   ${isRev?'':`<div class="bigstars">${[0,1,2].map(i=>`<span class="pop">${IC.star(i<st)}</span>`).join('')}</div>`}
   <h1>${msg}</h1>${newBest?'<span class="chip" style="color:var(--gold)">Жаңа рекорд</span>':''}
   <div class="stats"><div class="stat"><b>${pct}%</b><span>нәтиже</span></div><div class="stat"><b>${p.correct}/${p.list.length}</b><span>дұрыс</span></div><div class="stat"><b>+${p.xp+p.bonus}</b><span>XP</span></div></div>
+  ${p.key&&!p.earn&&!p.one?'<p class="note">Бұл деңгейден XP бұрын алынған: қайта тапсырғанда XP берілмейді.</p>':''}
   <p class="muted" style="font-weight:700">${R.nx?esc(R.nx.n)+' атағына дейін '+R.left+' XP':'Сен — Қаған!'}</p>
+  ${p.one?`<div class="panel" style="display:flex;flex-direction:column;gap:10px;text-align:left;width:100%"><span class="label">Жауаптарың</span>${oneShotRows(p.sec,P.oneShot[p.sec])}</div>`:''}
   ${canNext?`<button class="btn block" data-a="open" data-s="${TS[nextIdx].id}">Келесі бөлім: ${esc(TS[nextIdx].name)}</button>`:''}
-  ${p.mode==='quiz'&&pct<100?`<button class="btn ${canNext?'ghost':''} block" data-a="cards" data-s="${p.sec}">Карточкамен жаттау</button>`:''}
+  ${p.mode==='quiz'&&pct<100&&!p.one?`<button class="btn ${canNext?'ghost':''} block" data-a="cards" data-s="${p.sec}">Карточкамен жаттау</button>`:''}
   ${Object.keys(P.mistakes).length&&!isRev?`<button class="btn gold block" data-a="review">Қателерді қайталау</button>`:''}
   <button class="btn ghost block" data-a="home">Картаға қайту</button></div>`;
 }
@@ -630,7 +666,7 @@ async function vTop(){
 function vRanks(){
  const R=rankOf(P.xp);
  app.innerHTML=`<div class="nav"><h1>Атақтар</h1><button class="linkbtn" data-a="home">Артқа</button></div>
- <p class="muted">16 атақ, 4 дәреже: қола, күміс, алтын, көк. XP тест пен карточкадан жиналады.</p>
+ <p class="muted">16 атақ, 4 дәреже: қола, күміс, алтын, көк. XP тест пен карточкадан жиналады; әр деңгейден XP тек бірінші әрекетке беріледі.</p>
  <div class="list ladder">${TIERS.map((t,ti)=>`<div class="tierhead"><i style="background:${t.c}"></i><span class="label">${t.n} дәреже</span></div>`+RANKS.filter(r=>r.tier===ti).map(r=>{const cur=r.i===R.r.i,lock=P.xp<r.xp;
   return `<div class="step ${cur?'cur':''} ${lock?'lock':''}">${emblem(r)}<div class="grow"><b>${esc(r.n)}${cur?' · сен осындасың':''}</b><p>${esc(r.d)}</p>${cur&&R.nx?`<div class="bar" style="margin-top:6px"><i style="width:${R.pct}%"></i></div>`:''}</div><span class="xp">${r.xp} XP</span></div>`}).join('')).join('')}</div>`;
 }
@@ -649,15 +685,21 @@ async function vAdmin(){
  let players=[],progs=[];
  try{const [a,b]=await Promise.all([fb.from('players').select('*').order('xp',{ascending:false}).limit(500),fb.from('progress').select('*').limit(500)]);if(a.error||b.error)throw a.error||b.error;
   a.data.forEach(d=>players.push(d));b.data.forEach(d=>progs.push(d));
- }catch(e){document.getElementById('adm').innerHTML='<p class="err">Деректерді оқу мүмкін болмады. Firestore ережелерін (firestore.rules) жаңартқаныңды тексер.</p>';return}
+ }catch(e){document.getElementById('adm').innerHTML='<p class="err">Деректерді оқу мүмкін болмады. Supabase-те supabase.sql іске қосылғанын және сенің админ екеніңді тексер.</p>';return}
  const el=document.getElementById('adm');if(!el)return;
  const logins=Object.fromEntries(progs.map(x=>[x.uid,x.login||'']));
  const today=players.filter(x=>x.updated&&(Date.now()-new Date(x.updated))<864e5).length;
  const avg=players.length?Math.round(players.reduce((a,x)=>a+(x.xp||0),0)/players.length):0;
  const miss={};progs.forEach(x=>Object.keys((x.p&&x.p.mistakes)||{}).forEach(k=>miss[k]=(miss[k]||0)+1));
+ const lastSec=SECTIONS.filter(s=>s.oneShot);
+ const nameOf=Object.fromEntries(players.map(x=>[x.uid,x.name]));
+ const oneRes=lastSec.map(s=>({s,rows:progs.filter(x=>x.p&&x.p.oneShot&&x.p.oneShot[s.id]).map(x=>({uid:x.uid,name:nameOf[x.uid]||x.name||'Ойыншы',login:x.login||'',r:x.p.oneShot[s.id]})).sort((a,b)=>b.r.pct-a.r.pct||String(a.r.at).localeCompare(String(b.r.at)))}));
  const hard=Object.entries(miss).filter(([k])=>QBY[k]).sort((a,b)=>b[1]-a[1]).slice(0,8);
  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
   <div class="stats"><div class="stat"><b>${players.length}</b><span>ойыншы</span></div><div class="stat"><b>${today}</b><span>бүгін белсенді</span></div><div class="stat"><b>${avg}</b><span>орташа XP</span></div></div>
+  ${oneRes.map(({s,rows})=>`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Соңғы деңгей · ${esc(s.name)} · бір әрекет</span>
+   <p class="muted" style="font-size:.88rem">Тапсырды: ${rows.length} / ${players.length}${rows.length?' · орташа '+Math.round(rows.reduce((a,x)=>a+x.r.pct,0)/rows.length)+'%':''}</p>
+   ${rows.length?rows.map((x,i)=>`<button class="li" style="text-align:left;width:100%" data-a="player" data-u="${esc(x.uid)}"><span class="rank">${i+1}</span><div class="grow"><b>${esc(x.name)}</b><span>@${esc(x.login||'?')} · ${x.r.legacy?'бұрынғы нәтиже':ago(x.r.at)}</span></div><span class="chip">${x.r.correct}/${x.r.total} · ${x.r.pct}%</span></button>`).join(''):'<p class="muted">Әзірге ешкім тапсырмаған</p>'}</div>`).join('')}
   ${hard.length?`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Ең көп қате жіберілетін сұрақтар</span>${hard.map(([k,n])=>`<div><b style="font-size:.92rem">${esc(QBY[k].q)}</b><p class="muted" style="font-size:.85rem">Жауабы: ${esc(QBY[k].o[QBY[k].a])} · ${n} ойыншыда қате</p></div>`).join('')}</div>`:''}
   <div class="field"><label for="admq">Ойыншыны іздеу</label><input id="admq" placeholder="аты немесе логині"></div>
   <div class="list" id="admlist"></div></div>`;
@@ -678,8 +720,8 @@ async function vPlayer(uid){
   <div class="panel rankrow">${emblem(R.r)}<div class="t"><b>${esc(x.name||y.name||'Ойыншы')}</b><span class="muted" style="font-size:.88rem">@${esc(y.login||'?')} · ${esc(R.r.n)} · ${p.xp} XP${ad.data?' · админ':''}</span><span class="muted" style="font-size:.85rem">Соңғы кіру: ${ago(x.updated)}</span></div></div>
   <div class="stats"><div class="stat"><b>${p.quizzes}</b><span>тест тапсырды</span></div><div class="stat"><b>${Object.keys(p.learned).length}/${ALLQ.length}</b><span>жатталды</span></div><div class="stat"><b>${p.streak}</b><span>күн қатарынан</span></div></div>
   ${TESTS.map(t=>`<div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Тест ${t.num} · ${esc(t.name)}</span>
-   ${t.secs.map(s=>{const b=p.best[s.id]||0,l=s.qs.filter(q=>p.learned[q.id]).length;return `<div style="display:flex;flex-direction:column;gap:4px"><div class="barlbl" style="color:var(--ink)"><span>${esc(s.name)}</span><span>${b}% ${'★'.repeat(p.stars[s.id]||0)}</span></div><div class="bar"><i style="width:${b}%"></i></div><span class="muted" style="font-size:.8rem">Жатталды ${l}/${s.qs.length}</span></div>`}).join('')}
-   <span class="muted" style="font-weight:700;font-size:.88rem">Қорытынды сынақ: ${p.exam[t.id]?p.exam[t.id]+'%':'тапсырмаған'}</span></div>`).join('')}
+   ${t.secs.map(s=>{const o=s.oneShot&&p.oneShot&&p.oneShot[s.id],b=o?o.pct:p.best[s.id]||0,l=s.qs.filter(q=>p.learned[q.id]).length,n=(p.attempts||{})[s.id]||0;return `<div style="display:flex;flex-direction:column;gap:4px"><div class="barlbl" style="color:var(--ink)"><span>${esc(s.name)}</span><span>${o?o.correct+'/'+o.total+' · ':''}${b}% ${'★'.repeat(p.stars[s.id]||0)}</span></div><div class="bar"><i style="width:${b}%"></i></div><span class="muted" style="font-size:.8rem">Жатталды ${l}/${s.qs.length} · әрекет: ${n}${(p.xpDone||{})[s.id]?' · XP алынды':''}${s.oneShot?(o?' · тапсырды '+(o.legacy?'(бұрын)':ago(o.at)):' · тапсырмаған'):''}</span>${o&&o.answers?`<details><summary class="muted" style="font-size:.85rem;cursor:pointer">Жауаптарын көру</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${oneShotRows(s.id,o)}</div></details>`:''}</div>`}).join('')}
+   <span class="muted" style="font-weight:700;font-size:.88rem">Қорытынды сынақ: ${p.exam[t.id]?p.exam[t.id]+'%':'тапсырмаған'} · әрекет: ${(p.attempts||{})['exam:'+t.id]||0}</span></div>`).join('')}
   <div class="panel" style="display:flex;flex-direction:column;gap:10px"><span class="label">Қате жіберген сұрақтары · ${mist.length}</span>
    ${mist.length?mist.map(k=>`<div><b style="font-size:.9rem">${esc(QBY[k].q)}</b><p class="muted" style="font-size:.85rem">Жауабы: ${esc(QBY[k].o[QBY[k].a])}</p></div>`).join(''):'<p class="muted">Қате жоқ</p>'}</div>
   ${uid===me.uid?'':`<button class="btn ghost block" data-a="${ad.data?'rmadmin':'mkadmin'}" data-u="${esc(uid)}">${ad.data?'Админ құқығын алу':'Админ ету'}</button>
@@ -704,7 +746,7 @@ document.addEventListener('click',e=>{
  ({tab:()=>{authTab=t.dataset.t;vAuth()},test:()=>{P.cur=t.dataset.t;save();vHome()},logout,home:()=>render('home'),
   open:()=>{const ts=SECBY[s].test;if(!document.querySelector('.node')||P.cur!==ts){P.cur=ts;save();render('home')}openSheet(s)},close:()=>document.querySelector('.sheet-back')?.remove(),
   quiz:()=>startQuiz('quiz',s),cards:()=>startCards(s),review:()=>startQuiz('review'),exam:()=>allDone(P.cur)?startQuiz('exam'):toast('Алдымен барлық бөлімде 1 жұлдыз жина'),
-  pick:()=>pick(+t.dataset.o),next,quit:()=>render('home'),flip:()=>{if(!play.flip){play.flip=true;vCards()}},know:()=>cardAns(true),dunno:()=>cardAns(false),
+  pick:()=>pick(+t.dataset.o),next,quit:quitPlay,flip:()=>{if(!play.flip){play.flip=true;vCards()}},know:()=>cardAns(true),dunno:()=>cardAns(false),
   top:()=>render('top'),badges:()=>render('badges'),ranks:()=>render('ranks'),admin:()=>render('admin'),player:()=>render('player',t.dataset.u),filter:()=>{},mkadmin:()=>adminAct(t,'mk'),rmadmin:()=>adminAct(t,'rm'),delp:()=>adminAct(t,'del'),closelvl:()=>document.querySelector('.levelup')?.remove()})[a]?.();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('.sheet-back')?.remove();document.querySelector('.levelup')?.remove()}if((e.key==='Enter'||e.key===' ')&&e.target.matches('.card')){e.preventDefault();e.target.click()}});
